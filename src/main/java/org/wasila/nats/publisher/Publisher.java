@@ -18,6 +18,8 @@ package org.wasila.nats.publisher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nats.client.Connection;
 import io.nats.client.ConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wasila.nats.annotation.Subject;
 
 import java.lang.reflect.InvocationHandler;
@@ -25,6 +27,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 public class Publisher<T> {
+
+    private final Logger log = LoggerFactory.getLogger(Publisher.class);
 
     private final ConnectionFactory connectionFactory;
     private final PublisherInvocatorHandler handler;
@@ -51,13 +55,14 @@ public class Publisher<T> {
     private class PublisherInvocatorHandler implements InvocationHandler {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            System.out.println("Publisher invoke");
             Subject subject = method.getAnnotation(Subject.class);
             if (subject != null) {
                 Connection cn = connectionFactory.createConnection();
                 ObjectMapper objectMapper = new ObjectMapper();
                 cn.publish(subject.value(), objectMapper.writeValueAsBytes(args[0]));
                 cn.close();
+            } else {
+                log.warn("Could not invoke publish action: subject is null");
             }
             return null;
         }

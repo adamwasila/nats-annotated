@@ -15,18 +15,18 @@
  */
 package org.wasila.nats.router;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nats.client.Connection;
 import io.nats.client.ConnectionFactory;
 import io.nats.client.Subscription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wasila.nats.annotation.QueueGroup;
 import org.wasila.nats.annotation.Subject;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 public class Router {
+
+    private final Logger log = LoggerFactory.getLogger(Router.class);
 
     private final ConnectionFactory connectionFactory;
     private final Connection connection;
@@ -50,24 +52,14 @@ public class Router {
 
     private void addSubscription(String subject, String queueGroup, final Method method, final Object target) {
         Subscription subscription = connection.subscribe(subject, queueGroup, msg -> {
-            System.out.println("message handler");
             try {
                 method.invoke(target, jsonMapper.readValue(msg.getData(), method.getParameterTypes()[0]));
-            } catch (IllegalAccessException e) {
-                //TODO
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                //TODO
-                e.printStackTrace();
-            } catch (JsonParseException e) {
-                //TODO
-                e.printStackTrace();
-            } catch (JsonMappingException e) {
-                //TODO
-                e.printStackTrace();
+            } catch (ReflectiveOperationException e) {
+                log.error("Exception while invoking subscription handler", e);
+            } catch (JsonProcessingException e) {
+                log.error("Exception while invoking subscription handler", e);
             } catch (IOException e) {
-                //TODO
-                e.printStackTrace();
+                log.error("Exception while invoking subscription handler", e);
             }
         });
         subscriptions.add(subscription);
@@ -77,7 +69,7 @@ public class Router {
         List<Method> subjectMethods = getMethodsAnnotatedWith(object.getClass(), Subject.class);
         Subject classSubject = object.getClass().getAnnotation(Subject.class);
         String subjectPrefix = classSubject != null ? classSubject.value() : "";
-        System.out.println("Found " + subjectMethods.size() + " methods");
+        log.info("Found " + subjectMethods.size() + " methods");
         for (Method method : subjectMethods) {
             String subject = subjectPrefix + method.getAnnotation(Subject.class).value();
             QueueGroup queueGroup = method.getAnnotation(QueueGroup.class);
@@ -97,7 +89,7 @@ public class Router {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Cleanup!");
+                log.debug("Starting cleanup task");
                 unregisterAllAndClose();
             }
         }));
@@ -109,7 +101,7 @@ public class Router {
                 sub.unsubscribe();
             }
         } catch (IOException e) {
-            //TODO error logging
+            log.error("Unsubscribe failed", e);
         }
 
     }
