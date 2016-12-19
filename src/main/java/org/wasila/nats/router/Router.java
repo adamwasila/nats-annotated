@@ -35,24 +35,24 @@ import java.util.concurrent.TimeoutException;
 
 public class Router {
 
-    private final ConnectionFactory cf;
-    private final Connection nc;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ConnectionFactory connectionFactory;
+    private final Connection connection;
+    private final ObjectMapper jsonMapper = new ObjectMapper();
 
     private final List<Subscription> subscriptions;
 
     public Router() throws IOException, TimeoutException {
-        cf = new ConnectionFactory(ConnectionFactory.DEFAULT_URL);
-        nc = cf.createConnection();
+        connectionFactory = new ConnectionFactory(ConnectionFactory.DEFAULT_URL);
+        connection = connectionFactory.createConnection();
         subscriptions = new ArrayList<>();
         registerCleanupTask();
     }
 
     private void addSubscription(String subject, String queueGroup, final Method method, final Object target) {
-        Subscription subscription = nc.subscribe(subject, queueGroup, msg -> {
+        Subscription subscription = connection.subscribe(subject, queueGroup, msg -> {
             System.out.println("message handler");
             try {
-                method.invoke(target, mapper.readValue(msg.getData(), method.getParameterTypes()[0]));
+                method.invoke(target, jsonMapper.readValue(msg.getData(), method.getParameterTypes()[0]));
             } catch (IllegalAccessException e) {
                 //TODO
                 e.printStackTrace();

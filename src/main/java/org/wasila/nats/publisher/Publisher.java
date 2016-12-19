@@ -26,7 +26,7 @@ import java.lang.reflect.Proxy;
 
 public class Publisher<T> {
 
-    private final ConnectionFactory cf;
+    private final ConnectionFactory connectionFactory;
     private final PublisherInvocatorHandler handler;
     private final Class clazz;
 
@@ -44,7 +44,7 @@ public class Publisher<T> {
 
     public Publisher(Class clazz, String url) {
         this.clazz = clazz;
-        cf = new ConnectionFactory(url);
+        connectionFactory = new ConnectionFactory(url);
         handler = new PublisherInvocatorHandler();
     }
 
@@ -54,7 +54,7 @@ public class Publisher<T> {
             System.out.println("Publisher invoke");
             Subject subject = method.getAnnotation(Subject.class);
             if (subject != null) {
-                Connection cn = cf.createConnection();
+                Connection cn = connectionFactory.createConnection();
                 ObjectMapper objectMapper = new ObjectMapper();
                 cn.publish(subject.value(), objectMapper.writeValueAsBytes(args[0]));
                 cn.close();
