@@ -15,6 +15,8 @@
  */
 package org.wasila.nats.example;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.example.dto.Hello;
 import org.wasila.nats.publisher.Publisher;
@@ -28,20 +30,31 @@ public class PublisherExample {
 
     }
 
+    private static Logger log = LoggerFactory.getLogger(PublisherExample.class);
+
+    private static void sendMessage(ExamplePublisher publisher, String message, boolean isLast) throws InterruptedException {
+
+        Hello hello = new Hello(message, isLast);
+
+        log.info("sending: " + hello);
+        publisher.sendTest(hello);
+
+        Thread.sleep(500);
+    }
+
     public static void main(String[] args) throws InterruptedException {
 
         ExamplePublisher publisher = Publisher.builder()
                 .target(ExamplePublisher.class, "nats://localhost:4222");
 
-        publisher.sendTest(new Hello("hello", false));
+        Hello hello = new Hello("hello", false);
 
-        Thread.sleep(1000);
+        for (int i=0; i<5; i++) {
+            sendMessage(publisher, "hello", false);
+        }
+        sendMessage(publisher, "world", false);
 
-        publisher.sendTest(new Hello("world", false));
-
-        Thread.sleep(1000);
-
-        publisher.sendTest(new Hello(".", true));
+        sendMessage(publisher, ".", true);
 
     }
 
