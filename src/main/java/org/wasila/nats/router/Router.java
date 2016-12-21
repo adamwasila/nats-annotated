@@ -60,8 +60,7 @@ public class Router {
                                 try {
                                     return jsonMapper.readValue(msg.getData(), param.getType());
                                 } catch (IOException e) {
-                                    //TODO not so trivial to fix - needs some wrapping to unchecked exception first
-                                    e.printStackTrace();
+                                    throw new WrappingException(e);
                                 }
                             } else if (param.getAnnotation(ConnectionContext.class) != null) {
                                 return null;
@@ -80,11 +79,12 @@ public class Router {
 
             } catch (ReflectiveOperationException e) {
                 log.error("Exception while invoking subscription handler", e);
-            }
-            catch (JsonProcessingException e) {
+            } catch (JsonProcessingException e) {
                 log.error("Exception while invoking subscription handler", e);
             } catch (IOException e) {
                 log.error("Exception while invoking subscription handler", e);
+            } catch (WrappingException e) {
+                log.error("Exception while invoking subscription handler", e.getCause());
             }
         });
         subscriptions.add(subscription);
