@@ -20,6 +20,7 @@ import io.nats.client.Connection;
 import io.nats.client.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wasila.nats.annotation.ReplyTo;
 import org.wasila.nats.annotation.Subject;
 
 import java.lang.reflect.InvocationHandler;
@@ -56,10 +57,14 @@ public class Publisher<T> {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             Subject subject = method.getAnnotation(Subject.class);
+            ReplyTo subjectReplyTo = method.getAnnotation(ReplyTo.class);
+
+            String reply = subjectReplyTo == null ? null : subjectReplyTo.value();
+
             if (subject != null) {
                 Connection cn = connectionFactory.createConnection();
                 ObjectMapper objectMapper = new ObjectMapper();
-                cn.publish(subject.value(), objectMapper.writeValueAsBytes(args[0]));
+                cn.publish(subject.value(), reply, objectMapper.writeValueAsBytes(args[0]));
                 cn.close();
             } else {
                 log.warn("Could not invoke publish action: subject is null");

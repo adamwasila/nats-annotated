@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wasila.nats.example;
+package org.wasila.nats.examples.pubsub;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wasila.nats.annotation.Subject;
-import org.wasila.nats.example.dto.Hello;
+import org.wasila.nats.examples.pubsub.dto.Hello;
 import org.wasila.nats.publisher.Publisher;
 
 public class PublisherExample {

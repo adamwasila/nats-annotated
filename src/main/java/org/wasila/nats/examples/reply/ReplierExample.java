@@ -13,19 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wasila.nats.example;
+package org.wasila.nats.examples.reply;
 
+import io.nats.client.Connection;
+import io.nats.client.Message;
+import org.wasila.nats.annotation.ConnectionContext;
+import org.wasila.nats.annotation.MessageContext;
+import org.wasila.nats.annotation.Subject;
+import org.wasila.nats.examples.pubsub.Quitter;
+import org.wasila.nats.examples.reply.dto.Reply;
+import org.wasila.nats.examples.reply.dto.Request;
 import org.wasila.nats.router.Router;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class RouterUseExample implements Quitter {
+public class ReplierExample implements Quitter {
+
+    public static class ReplierResource {
+
+        private final Quitter quitter;
+
+        public ReplierResource(Quitter quitter) {
+            this.quitter = quitter;
+        }
+
+        @Subject("foobar")
+        public Reply handleReply(@ConnectionContext Connection connection, @MessageContext Message message, Request request) {
+            System.out.println("Received request: " + request);
+            quitter.setCanQuit(true);
+            return new Reply("hi!");
+        }
+
+    }
 
     AtomicBoolean canQuit = new AtomicBoolean(false);
 
-    public RouterUseExample() {
+    public ReplierExample() {
         canQuit.set(false);
     }
 
@@ -33,7 +58,7 @@ public class RouterUseExample implements Quitter {
         Router router = new Router();
 
         try {
-            router.register(new ExampleResource(this));
+            router.register(new ReplierResource(this));
 
             while (!canQuit.get()) {
                 Thread.sleep(1000);
@@ -49,7 +74,7 @@ public class RouterUseExample implements Quitter {
     }
 
     public static void main(String[] args) throws IOException, TimeoutException, InterruptedException {
-        new RouterUseExample().executeExample();
+        new ReplierExample().executeExample();
     }
 
 }

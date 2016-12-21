@@ -13,43 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wasila.nats.example.dto;
+package org.wasila.nats.examples.reply.dto;
 
-public class Hello {
+public class Request {
 
-    public String value;
+    private String requestMessage;
 
-    public boolean lastMessage;
-
-    public Hello() {
+    public Request() {
     }
 
-    public Hello(String value, boolean lastMessage) {
-        this.value = value;
-        this.lastMessage = lastMessage;
+    public Request(String requestMessage) {
+        this.requestMessage = requestMessage;
     }
 
-    public String getValue() {
-        return value;
+    public String getRequestMessage() {
+        return requestMessage;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public boolean isLastMessage() {
-        return lastMessage;
-    }
-
-    public void setLastMessage(boolean lastMessage) {
-        this.lastMessage = lastMessage;
+    public void setRequestMessage(String requestMessage) {
+        this.requestMessage = requestMessage;
     }
 
     @Override
     public String toString() {
-        return "Hello{" +
-                "value='" + value + '\'' +
-                ", lastMessage=" + lastMessage +
+        return "Request{" +
+                "requestMessage='" + requestMessage + '\'' +
                 '}';
     }
 }

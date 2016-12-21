@@ -72,6 +72,12 @@ public class Router {
                         }
                 ).toArray();
 
+                Object reply = method.invoke(target, params);
+
+                if (reply != null) {
+                    connection.publish(msg.getReplyTo(), jsonMapper.writeValueAsBytes(reply));
+                }
+
             } catch (ReflectiveOperationException e) {
                 log.error("Exception while invoking subscription handler", e);
             }

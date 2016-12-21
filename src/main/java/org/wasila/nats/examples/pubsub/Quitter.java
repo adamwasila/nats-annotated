@@ -13,25 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wasila.nats.example;
+package org.wasila.nats.examples.pubsub;
 
-import org.wasila.nats.annotation.QueueGroup;
-import org.wasila.nats.annotation.Subject;
-import org.wasila.nats.example.dto.Hello;
+public interface Quitter {
 
-public class ExampleResource {
-
-    private final Quitter quitter;
-
-    public ExampleResource(Quitter quitter) {
-        this.quitter = quitter;
-    }
-
-    @Subject("somesubject")
-    @QueueGroup("group1")
-    public void test(Hello hello) {
-        System.out.println("Received message: " + hello);
-        quitter.setCanQuit(hello.isLastMessage());
-    }
+    void setCanQuit(boolean canQuit);
 
 }
