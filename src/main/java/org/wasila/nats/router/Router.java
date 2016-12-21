@@ -22,6 +22,8 @@ import io.nats.client.ConnectionFactory;
 import io.nats.client.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wasila.nats.annotation.ConnectionContext;
+import org.wasila.nats.annotation.MessageContext;
 import org.wasila.nats.annotation.QueueGroup;
 import org.wasila.nats.annotation.Subject;
 
@@ -53,10 +55,27 @@ public class Router {
     private void addSubscription(String subject, String queueGroup, final Method method, final Object target) {
         Subscription subscription = connection.subscribe(subject, queueGroup, msg -> {
             try {
-                method.invoke(target, jsonMapper.readValue(msg.getData(), method.getParameterTypes()[0]));
+                Object[] params = Arrays.stream(method.getParameters()).map(param -> {
+                            if (param.getAnnotations().length == 0) {
+                                try {
+                                    return jsonMapper.readValue(msg.getData(), param.getType());
+                                } catch (IOException e) {
+                                    //TODO not so trivial to fix - needs some wrapping to unchecked exception first
+                                    e.printStackTrace();
+                                }
+                            } else if (param.getAnnotation(ConnectionContext.class) != null) {
+                                return null;
+                            } else if (param.getAnnotation(MessageContext.class) != null) {
+                                return msg;
+                            }
+                            return null;
+                        }
+                ).toArray();
+
             } catch (ReflectiveOperationException e) {
                 log.error("Exception while invoking subscription handler", e);
-            } catch (JsonProcessingException e) {
+            }
+            catch (JsonProcessingException e) {
                 log.error("Exception while invoking subscription handler", e);
             } catch (IOException e) {
                 log.error("Exception while invoking subscription handler", e);
