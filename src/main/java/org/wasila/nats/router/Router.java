@@ -15,7 +15,6 @@
  */
 package org.wasila.nats.router;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nats.client.Connection;
 import io.nats.client.ConnectionFactory;
@@ -77,11 +76,7 @@ public class Router {
                     connection.publish(msg.getReplyTo(), jsonMapper.writeValueAsBytes(reply));
                 }
 
-            } catch (ReflectiveOperationException e) {
-                log.error("Exception while invoking subscription handler", e);
-            } catch (JsonProcessingException e) {
-                log.error("Exception while invoking subscription handler", e);
-            } catch (IOException e) {
+            } catch (ReflectiveOperationException | IOException e) {
                 log.error("Exception while invoking subscription handler", e);
             } catch (WrappingException e) {
                 log.error("Exception while invoking subscription handler", e.getCause());
