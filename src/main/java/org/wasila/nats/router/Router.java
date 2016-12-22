@@ -120,6 +120,7 @@ public class Router {
             for (Subscription sub : subscriptions) {
                 sub.unsubscribe();
             }
+            connection.close();
         } catch (IOException e) {
             log.error("Unsubscribe failed", e);
         }
