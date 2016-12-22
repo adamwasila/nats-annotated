@@ -25,6 +25,7 @@ import org.wasila.nats.annotation.ConnectionContext;
 import org.wasila.nats.annotation.MessageContext;
 import org.wasila.nats.annotation.QueueGroup;
 import org.wasila.nats.annotation.Subject;
+import org.wasila.nats.annotation.Subscribe;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -87,19 +88,25 @@ public class Router {
     }
 
     public void register(Object object) {
-        List<Method> subjectMethods = getMethodsAnnotatedWith(object.getClass(), Subject.class);
+        List<Method> subscribeMethod = getMethodsAnnotatedWith(object.getClass(), Subscribe.class);
         Subject classSubject = object.getClass().getAnnotation(Subject.class);
-        String subjectPrefix = classSubject != null ? classSubject.value() : "";
-        log.info("Registering " + subjectMethods.size() + " methods");
-        for (Method method : subjectMethods) {
-            log.info(" Method: " + method.getName());
-            String subject = new StringJoiner(".").add(subjectPrefix).add(method.getAnnotation(Subject.class).value()).toString();
-            QueueGroup queueGroup = method.getAnnotation(QueueGroup.class);
-            if (queueGroup != null) {
-                addSubscription(subject, queueGroup.value(), method, object);
-            } else {
-                addSubscription(subject, null, method, object);
+        String subjectPrefix = classSubject != null ? classSubject.value() : null;
+        log.info("Registering " + subscribeMethod.size() + " methods");
+        for (Method method : subscribeMethod) {
+            StringJoiner subjectJoiner = new StringJoiner(".");
+
+            if (subjectPrefix != null) {
+                subjectJoiner.add(subjectPrefix);
             }
+
+            Subject methodSubject = method.getAnnotation(Subject.class);
+            if (methodSubject != null) {
+                subjectJoiner.add(methodSubject.value());
+            }
+            QueueGroup queueGroup = method.getAnnotation(QueueGroup.class);
+            String queueGroupValue = queueGroup != null ? queueGroup.value() : null;
+            addSubscription(subjectJoiner.toString(), queueGroupValue, method, object);
+            log.info(" Method: " + method.getName() + ", Subject: " + subjectJoiner.toString());
         }
     }
 

@@ -20,6 +20,7 @@ import io.nats.client.Message;
 import org.wasila.nats.annotation.ConnectionContext;
 import org.wasila.nats.annotation.MessageContext;
 import org.wasila.nats.annotation.Subject;
+import org.wasila.nats.annotation.Subscribe;
 import org.wasila.nats.examples.pubsub.Quitter;
 import org.wasila.nats.examples.reply.dto.Reply;
 import org.wasila.nats.examples.reply.dto.Request;
@@ -39,6 +40,7 @@ public class ReplierExample implements Quitter {
             this.quitter = quitter;
         }
 
+        @Subscribe
         @Subject("foobar")
         public Reply handleReply(@ConnectionContext Connection connection, @MessageContext Message message, Request request) {
             System.out.println("Received request: " + request);

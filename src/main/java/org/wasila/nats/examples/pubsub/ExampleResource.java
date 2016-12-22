@@ -17,6 +17,7 @@ package org.wasila.nats.examples.pubsub;
 
 import org.wasila.nats.annotation.QueueGroup;
 import org.wasila.nats.annotation.Subject;
+import org.wasila.nats.annotation.Subscribe;
 import org.wasila.nats.examples.pubsub.dto.Hello;
 
 public class ExampleResource {
@@ -27,6 +28,7 @@ public class ExampleResource {
         this.quitter = quitter;
     }
 
+    @Subscribe
     @Subject("somesubject")
     @QueueGroup("group1")
     public void test(Hello hello) {

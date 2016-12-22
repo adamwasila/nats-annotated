@@ -17,6 +17,7 @@ package org.wasila.nats.examples.reply;
 
 import org.wasila.nats.annotation.ReplyTo;
 import org.wasila.nats.annotation.Subject;
+import org.wasila.nats.annotation.Subscribe;
 import org.wasila.nats.examples.pubsub.Quitter;
 import org.wasila.nats.examples.reply.dto.Reply;
 import org.wasila.nats.examples.reply.dto.Request;
@@ -45,6 +46,7 @@ public class SenderExample implements Quitter {
             this.quitter = quitter;
         }
 
+        @Subscribe
         @Subject("foobarreply")
         public void handleReply(Reply reply) {
             System.out.println("Received reply: " + reply);
