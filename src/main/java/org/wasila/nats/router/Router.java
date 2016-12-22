@@ -32,6 +32,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.concurrent.TimeoutException;
 
 public class Router {
@@ -89,9 +90,10 @@ public class Router {
         List<Method> subjectMethods = getMethodsAnnotatedWith(object.getClass(), Subject.class);
         Subject classSubject = object.getClass().getAnnotation(Subject.class);
         String subjectPrefix = classSubject != null ? classSubject.value() : "";
-        log.info("Found " + subjectMethods.size() + " methods");
+        log.info("Registering " + subjectMethods.size() + " methods");
         for (Method method : subjectMethods) {
-            String subject = subjectPrefix + method.getAnnotation(Subject.class).value();
+            log.info(" Method: " + method.getName());
+            String subject = new StringJoiner(".").add(subjectPrefix).add(method.getAnnotation(Subject.class).value()).toString();
             QueueGroup queueGroup = method.getAnnotation(QueueGroup.class);
             if (queueGroup != null) {
                 addSubscription(subject, queueGroup.value(), method, object);
