@@ -17,7 +17,7 @@ package org.wasila.nats.examples.composite;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wasila.nats.annotation.Subject;
+import org.wasila.nats.annotation.Publish;
 import org.wasila.nats.examples.composite.dto.Hello;
 import org.wasila.nats.publisher.Publisher;
 
@@ -25,10 +25,10 @@ public class CompositePublisher {
 
     public interface ExamplePublisher {
 
-        @Subject("test.me")
+        @Publish(subject = "test.me")
         void sendTest(Hello hello);
 
-        @Subject("test.abc")
+        @Publish(subject = "test.abc")
         void sendTest2(Hello hello);
 
     }

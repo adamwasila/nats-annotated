@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wasila.nats.examples.pubsub;
+package org.wasila.nats.annotation;
 
-import org.wasila.nats.annotation.QueueGroup;
-import org.wasila.nats.annotation.Subscribe;
-import org.wasila.nats.examples.pubsub.dto.Hello;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class ExampleResource {
-
-    @Subscribe(subject="somesubject")
-    @QueueGroup("group1")
-    public void test(Hello hello) {
-        System.out.println("Received message: " + hello);
-    }
-
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD})
+public @interface Publish {
+    String subject() default "";
+    String replyTo() default "";
 }

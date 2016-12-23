@@ -15,8 +15,7 @@
  */
 package org.wasila.nats.examples.reply;
 
-import org.wasila.nats.annotation.ReplyTo;
-import org.wasila.nats.annotation.Subject;
+import org.wasila.nats.annotation.Publish;
 import org.wasila.nats.annotation.Subscribe;
 import org.wasila.nats.examples.reply.dto.Reply;
 import org.wasila.nats.examples.reply.dto.Request;
@@ -31,15 +30,13 @@ public class SenderExample {
 
     public interface ExamplePublisher {
 
-        @Subject("foobar")
-        @ReplyTo("foobarreply")
+        @Publish(subject="foobar", replyTo="foobarreply")
         void sendRequest(Request request);
 
     }
 
     public static class SenderResource {
-        @Subscribe
-        @Subject("foobarreply")
+        @Subscribe(subject="foobarreply")
         public void handleReply(Reply reply) {
             System.out.println("Received reply: " + reply);
         }

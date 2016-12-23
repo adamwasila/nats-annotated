@@ -27,20 +27,17 @@ public class CompositeResource {
     public CompositeResource() {
     }
 
-    @Subscribe
-    @Subject("me")
+    @Subscribe(subject="me")
     public void testTestMe(@MessageContext Message message, Hello hello) {
         System.out.println("[me] Received message: " + hello + " from " + message.getSubject());
     }
 
-    @Subscribe
-    @Subject("abc")
+    @Subscribe(subject="abc")
     public void testTestAbc(@MessageContext Message message, Hello hello) {
         System.out.println("[abc] Received message: " + hello + " from " + message.getSubject());
     }
 
-    @Subscribe
-    @Subject("me.me")
+    @Subscribe(subject="me.me")
     public void testTestMeMe(@MessageContext Message message, Hello hello) {
         System.out.println("[abc] Received message: " + hello + " from " + message.getSubject());
     }
@@ -50,8 +47,7 @@ public class CompositeResource {
         System.out.println("[abc] Received message: " + hello + " from " + message.getSubject());
     }
 
-    @Subscribe
-    @Subject("*")
+    @Subscribe(subject="*")
     public void testAll(@MessageContext Message message, Hello hello) {
         System.out.println("[*] Received message: " + hello + " from " + message.getSubject());
     }

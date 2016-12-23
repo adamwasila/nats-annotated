@@ -17,7 +17,7 @@ package org.wasila.nats.examples.pubsub;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wasila.nats.annotation.Subject;
+import org.wasila.nats.annotation.Publish;
 import org.wasila.nats.examples.pubsub.dto.Hello;
 import org.wasila.nats.publisher.Publisher;
 
@@ -25,7 +25,7 @@ public class PublisherExample {
 
     public interface ExamplePublisher {
 
-        @Subject("somesubject")
+        @Publish(subject = "somesubject")
         void sendTest(Hello hello);
 
     }

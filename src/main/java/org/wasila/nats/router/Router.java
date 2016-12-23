@@ -99,9 +99,9 @@ public class Router {
                 subjectJoiner.add(subjectPrefix);
             }
 
-            Subject methodSubject = method.getAnnotation(Subject.class);
-            if (methodSubject != null) {
-                subjectJoiner.add(methodSubject.value());
+            Subscribe methodSubject = method.getAnnotation(Subscribe.class);
+            if (!methodSubject.subject().isEmpty()) {
+                subjectJoiner.add(methodSubject.subject());
             }
             QueueGroup queueGroup = method.getAnnotation(QueueGroup.class);
             String queueGroupValue = queueGroup != null ? queueGroup.value() : null;
