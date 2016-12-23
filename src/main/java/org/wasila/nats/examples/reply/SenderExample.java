@@ -18,7 +18,6 @@ package org.wasila.nats.examples.reply;
 import org.wasila.nats.annotation.ReplyTo;
 import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.annotation.Subscribe;
-import org.wasila.nats.examples.pubsub.Quitter;
 import org.wasila.nats.examples.reply.dto.Reply;
 import org.wasila.nats.examples.reply.dto.Request;
 import org.wasila.nats.publisher.Publisher;
@@ -28,7 +27,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SenderExample implements Quitter {
+public class SenderExample {
 
     public interface ExamplePublisher {
 
@@ -39,44 +38,26 @@ public class SenderExample implements Quitter {
     }
 
     public static class SenderResource {
-
-        private final Quitter quitter;
-
-        public SenderResource(Quitter quitter) {
-            this.quitter = quitter;
-        }
-
         @Subscribe
         @Subject("foobarreply")
         public void handleReply(Reply reply) {
             System.out.println("Received reply: " + reply);
-            quitter.setCanQuit(true);
         }
 
     }
 
     AtomicBoolean canQuit = new AtomicBoolean(false);
 
-    @Override
-    public void setCanQuit(boolean canQuit) {
-        this.canQuit.set(canQuit);
-    }
-
     private void executePublish() throws IOException, TimeoutException, InterruptedException {
         Router router = new Router();
 
         try {
-            router.register(new SenderResource(this));
+            router.register(new SenderResource());
 
             ExamplePublisher publisher = Publisher.builder()
                     .target(ExamplePublisher.class, "nats://localhost:4222");
 
             publisher.sendRequest(new Request("hello there!"));
-
-            while (!canQuit.get()) {
-                Thread.sleep(1000);
-            }
-            System.out.println("Quitting...");
 
         } finally {
             router.close();

@@ -22,18 +22,11 @@ import org.wasila.nats.examples.pubsub.dto.Hello;
 
 public class ExampleResource {
 
-    private final Quitter quitter;
-
-    public ExampleResource(Quitter quitter) {
-        this.quitter = quitter;
-    }
-
     @Subscribe
     @Subject("somesubject")
     @QueueGroup("group1")
     public void test(Hello hello) {
         System.out.println("Received message: " + hello);
-        quitter.setCanQuit(hello.isLastMessage());
     }
 
 }

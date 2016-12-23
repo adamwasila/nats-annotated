@@ -15,64 +15,40 @@
  */
 package org.wasila.nats.examples.reply;
 
-import io.nats.client.Connection;
-import io.nats.client.Message;
-import org.wasila.nats.annotation.ConnectionContext;
-import org.wasila.nats.annotation.MessageContext;
 import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.annotation.Subscribe;
-import org.wasila.nats.examples.pubsub.Quitter;
 import org.wasila.nats.examples.reply.dto.Reply;
 import org.wasila.nats.examples.reply.dto.Request;
+import org.wasila.nats.examples.util.KeyReader;
 import org.wasila.nats.router.Router;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ReplierExample implements Quitter {
+public class ReplierExample {
 
     public static class ReplierResource {
 
-        private final Quitter quitter;
-
-        public ReplierResource(Quitter quitter) {
-            this.quitter = quitter;
-        }
-
         @Subscribe
         @Subject("foobar")
-        public Reply handleReply(@ConnectionContext Connection connection, @MessageContext Message message, Request request) {
+        public Reply handleReply(Request request) {
             System.out.println("Received request: " + request);
-            quitter.setCanQuit(true);
             return new Reply("hi!");
         }
 
-    }
-
-    AtomicBoolean canQuit = new AtomicBoolean(false);
-
-    public ReplierExample() {
-        canQuit.set(false);
     }
 
     public void executeExample() throws InterruptedException, IOException, TimeoutException {
         Router router = new Router();
 
         try {
-            router.register(new ReplierResource(this));
+            router.register(new ReplierResource());
 
-            while (!canQuit.get()) {
-                Thread.sleep(1000);
-            }
-            System.out.println("Quitting...");
+            KeyReader.waitForEnter();
+
         } finally {
             router.close();
         }
-    }
-
-    public void setCanQuit(boolean canQuit) {
-        this.canQuit.set(canQuit);
     }
 
     public static void main(String[] args) throws IOException, TimeoutException, InterruptedException {

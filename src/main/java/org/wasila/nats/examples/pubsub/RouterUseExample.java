@@ -15,13 +15,14 @@
  */
 package org.wasila.nats.examples.pubsub;
 
+import org.wasila.nats.examples.util.KeyReader;
 import org.wasila.nats.router.Router;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class RouterUseExample implements Quitter {
+public class RouterUseExample {
 
     AtomicBoolean canQuit = new AtomicBoolean(false);
 
@@ -33,19 +34,13 @@ public class RouterUseExample implements Quitter {
         Router router = new Router();
 
         try {
-            router.register(new ExampleResource(this));
+            router.register(new ExampleResource());
 
-            while (!canQuit.get()) {
-                Thread.sleep(1000);
-            }
-            System.out.println("Quitting...");
+            KeyReader.waitForEnter();
+
         } finally {
             router.close();
         }
-    }
-
-    public void setCanQuit(boolean canQuit) {
-        this.canQuit.set(canQuit);
     }
 
     public static void main(String[] args) throws IOException, TimeoutException, InterruptedException {
