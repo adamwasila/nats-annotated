@@ -127,7 +127,9 @@ public class Router {
     private void unregisterAllAndClose() {
         try {
             for (Subscription sub : subscriptions) {
-                sub.unsubscribe();
+                if (sub.isValid()) {
+                    sub.unsubscribe();
+                }
             }
             connection.close();
         } catch (IOException e) {
