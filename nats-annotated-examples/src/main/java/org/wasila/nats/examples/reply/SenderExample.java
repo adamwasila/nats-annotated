@@ -16,7 +16,6 @@
 package org.wasila.nats.examples.reply;
 
 import org.wasila.nats.annotation.Publish;
-import org.wasila.nats.annotation.Subscribe;
 import org.wasila.nats.examples.reply.dto.Reply;
 import org.wasila.nats.examples.reply.dto.Request;
 import org.wasila.nats.publisher.Publisher;
@@ -24,37 +23,25 @@ import org.wasila.nats.router.Router;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SenderExample {
 
     public interface ExamplePublisher {
 
         @Publish(subject="foobar", replyTo="foobarreply")
-        void sendRequest(Request request);
+        Reply sendRequest(Request request);
 
     }
-
-    public static class SenderResource {
-        @Subscribe(subject="foobarreply")
-        public void handleReply(Reply reply) {
-            System.out.println("Received reply: " + reply);
-        }
-
-    }
-
-    AtomicBoolean canQuit = new AtomicBoolean(false);
 
     private void executePublish() throws IOException, TimeoutException, InterruptedException {
         Router router = new Router();
 
         try {
-            router.register(new SenderResource());
-
             ExamplePublisher publisher = Publisher.builder()
                     .target(ExamplePublisher.class, "nats://localhost:4222");
 
-            publisher.sendRequest(new Request("hello there!"));
+            Reply reply = publisher.sendRequest(new Request("hello there!"));
+            System.out.println("Received reply: " + reply);
 
         } finally {
             router.close();

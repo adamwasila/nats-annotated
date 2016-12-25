@@ -18,6 +18,7 @@ package org.wasila.nats.publisher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nats.client.Connection;
 import io.nats.client.ConnectionFactory;
+import io.nats.client.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wasila.nats.annotation.Publish;
@@ -29,6 +30,8 @@ import java.lang.reflect.Proxy;
 public class Publisher<T> {
 
     private final Logger log = LoggerFactory.getLogger(Publisher.class);
+
+    private final static int REPLY_TIMEOUT = 5000;
 
     private final ConnectionFactory connectionFactory;
     private final PublisherInvocatorHandler handler;
@@ -56,19 +59,28 @@ public class Publisher<T> {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             Publish subject = method.getAnnotation(Publish.class);
+
             String reply = (subject.replyTo() == null || subject.replyTo().isEmpty()) ? null : subject.replyTo();
+
+            Class<?> retType = method.getReturnType();
+
+            Object value = null;
 
             if (subject != null) {
                 String subjectValue = subject.subject();
-
                 Connection cn = connectionFactory.createConnection();
                 ObjectMapper objectMapper = new ObjectMapper();
-                cn.publish(subjectValue, reply, objectMapper.writeValueAsBytes(args[0]));
+                if (retType != void.class) {
+                    Message msg = cn.request(subjectValue, objectMapper.writeValueAsBytes(args[0]), REPLY_TIMEOUT);
+                    value = objectMapper.readValue(msg.getData(), retType);
+                } else {
+                    cn.publish(subjectValue, reply, objectMapper.writeValueAsBytes(args[0]));
+                }
                 cn.close();
             } else {
                 log.warn("Could not invoke publish action: subject is null");
             }
-            return null;
+            return value;
         }
     }
 
