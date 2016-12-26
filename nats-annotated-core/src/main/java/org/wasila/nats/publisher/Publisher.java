@@ -31,8 +31,6 @@ public class Publisher<T> {
 
     private final Logger log = LoggerFactory.getLogger(Publisher.class);
 
-    private final static int REPLY_TIMEOUT = 5000;
-
     private final ConnectionFactory connectionFactory;
     private final PublisherInvocatorHandler handler;
     private final Class clazz;
@@ -68,10 +66,12 @@ public class Publisher<T> {
 
             if (subject != null) {
                 String subjectValue = subject.subject();
+
                 Connection cn = connectionFactory.createConnection();
                 ObjectMapper objectMapper = new ObjectMapper();
                 if (retType != void.class) {
-                    Message msg = cn.request(subjectValue, objectMapper.writeValueAsBytes(args[0]), REPLY_TIMEOUT);
+                    Message msg = cn.request(subjectValue, objectMapper.writeValueAsBytes(args[0]),
+                            subject.timeout(), subject.timeoutUnit());
                     value = objectMapper.readValue(msg.getData(), retType);
                 } else {
                     cn.publish(subjectValue, reply, objectMapper.writeValueAsBytes(args[0]));
