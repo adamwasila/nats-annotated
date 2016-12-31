@@ -13,4 +13,5 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.6.3'
 
     testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-all:1.10.19'
 }

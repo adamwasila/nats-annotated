@@ -36,10 +36,16 @@ public class Publisher<T> {
     private final Class clazz;
 
     public static class Builder {
-        public <T> T target(Class<T> clazz, String url) {
-            Publisher<T> publisher = new Publisher<T>(clazz, url);
+
+        public <T> T target(Class<T> clazz, ConnectionFactory connectionFactory) {
+            Publisher<T> publisher = new Publisher<>(connectionFactory, clazz);
             return publisher.createProxyImplementation();
         }
+
+        public <T> T target(Class<T> clazz, String url) {
+            return this.target(clazz, new ConnectionFactory(url));
+        }
+
     }
 
     private T createProxyImplementation() {
@@ -47,9 +53,9 @@ public class Publisher<T> {
                 new Class[] {clazz}, new PublisherInvocatorHandler());
     }
 
-    public Publisher(Class clazz, String url) {
+    private Publisher(ConnectionFactory connectionFactory, Class clazz) {
         this.clazz = clazz;
-        connectionFactory = new ConnectionFactory(url);
+        this.connectionFactory = connectionFactory;
         handler = new PublisherInvocatorHandler();
     }
 
