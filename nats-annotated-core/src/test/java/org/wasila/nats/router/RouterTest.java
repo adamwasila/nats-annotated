@@ -21,6 +21,7 @@ import io.nats.client.ConnectionFactory;
 import io.nats.client.MessageHandler;
 import org.junit.Before;
 import org.junit.Test;
+import org.wasila.nats.annotation.QueueGroup;
 import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.annotation.Subscribe;
 
@@ -78,6 +79,25 @@ public class RouterTest {
         router.close();
 
         verify(cn).subscribe(eq("base-subject.test-subject"), isNull(String.class), isA(MessageHandler.class));
+        verify(cn).close();
+        verifyNoMoreInteractions(cn);
+    }
+
+    public static class TestQueueGroupResource {
+        @Subscribe(subject = "test-subject")
+        @QueueGroup("group1")
+        public void helloWorld() {
+        }
+    }
+
+    @Test
+    public void createRouterWithQueueGroupSubscription() throws IOException, TimeoutException {
+        Router router = new Router(cf);
+        router.register(new TestQueueGroupResource());
+
+        router.close();
+
+        verify(cn).subscribe(eq("test-subject"), eq("group1"), isA(MessageHandler.class));
         verify(cn).close();
         verifyNoMoreInteractions(cn);
     }
