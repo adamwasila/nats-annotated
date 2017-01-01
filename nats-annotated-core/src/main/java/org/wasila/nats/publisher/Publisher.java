@@ -22,6 +22,7 @@ import io.nats.client.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wasila.nats.annotation.Publish;
+import org.wasila.nats.annotation.Subject;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -62,6 +63,7 @@ public class Publisher<T> {
     private class PublisherInvocatorHandler implements InvocationHandler {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            Subject baseSubject = method.getDeclaringClass().getAnnotation(Subject.class);
             Publish subject = method.getAnnotation(Publish.class);
 
             String reply = (subject.replyTo() == null || subject.replyTo().isEmpty()) ? null : subject.replyTo();
@@ -71,7 +73,11 @@ public class Publisher<T> {
             Object value = null;
 
             if (subject != null) {
-                String subjectValue = subject.subject();
+                String subjectValue = "";
+                if (baseSubject != null) {
+                    subjectValue = baseSubject.value() + ".";
+                }
+                subjectValue += subject.subject();
 
                 Connection cn = connectionFactory.createConnection();
                 ObjectMapper objectMapper = new ObjectMapper();
