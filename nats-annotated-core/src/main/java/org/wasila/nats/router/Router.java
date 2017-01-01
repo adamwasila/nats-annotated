@@ -167,8 +167,4 @@ public class Router {
         return methods;
     }
 
-    public static void main(String[] args) {
-
-    }
-
 }
