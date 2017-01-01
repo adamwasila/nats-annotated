@@ -148,6 +148,7 @@ public class Router {
 
     }
 
+    // code taken from: http://stackoverflow.com/questions/6593597/java-seek-a-method-with-specific-annotation-and-its-annotation-element
     private static List<Method> getMethodsAnnotatedWith(final Class<?> type, final Class<? extends Annotation> annotation) {
         final List<Method> methods = new ArrayList<Method>();
         Class<?> klass = type;
