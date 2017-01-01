@@ -101,4 +101,22 @@ public class PublisherTest {
         assertThat(response.testProperty, equalTo("propertyValue"));
     }
 
+    @Subject("base-subject")
+    public interface PublisherInterfaceWithComposedSubject {
+        @Publish(subject = "my-subject")
+        void publishMe(TestDto test);
+    }
+
+    @Test
+    public void createSimplePublisherWithComposedSubject() throws IOException, TimeoutException {
+
+        PublisherInterfaceWithComposedSubject publisher = Publisher.builder().target(PublisherInterfaceWithComposedSubject.class, cf);
+
+        publisher.publishMe(new TestDto());
+
+        verify(cn).publish(eq("base-subject.my-subject"), isNull(String.class), any(byte[].class));
+        verify(cn).close();
+        verifyNoMoreInteractions(cn);
+    }
+
 }
