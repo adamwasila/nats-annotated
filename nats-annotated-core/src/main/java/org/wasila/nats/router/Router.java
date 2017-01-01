@@ -40,7 +40,6 @@ public class Router {
 
     private final Logger log = LoggerFactory.getLogger(Router.class);
 
-    private final ConnectionFactory connectionFactory;
     private final Connection connection;
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -48,9 +47,12 @@ public class Router {
     private Thread shutdownHook;
 
     public Router() throws IOException, TimeoutException {
-        connectionFactory = new ConnectionFactory(ConnectionFactory.DEFAULT_URL);
-        connection = connectionFactory.createConnection();
-        subscriptions = new ArrayList<>();
+        this(new ConnectionFactory(ConnectionFactory.DEFAULT_URL));
+    }
+
+    public Router(ConnectionFactory connectionFactory) throws IOException, TimeoutException {
+        this.connection = connectionFactory.createConnection();
+        this.subscriptions = new ArrayList<>();
         registerCleanupTask();
     }
 
