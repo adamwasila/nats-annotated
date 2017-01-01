@@ -45,6 +45,7 @@ public class Router {
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
     private final List<Subscription> subscriptions;
+    private Thread shutdownHook;
 
     public Router() throws IOException, TimeoutException {
         connectionFactory = new ConnectionFactory(ConnectionFactory.DEFAULT_URL);
@@ -115,17 +116,24 @@ public class Router {
     }
 
     private void registerCleanupTask() {
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                log.debug("Starting cleanup task");
-                unregisterAllAndClose();
-            }
-        }));
+        if (this.shutdownHook == null) {
+            this.shutdownHook = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    log.debug("Starting cleanup task");
+                    unregisterAllAndClose();
+                }
+            });
+            Runtime.getRuntime().addShutdownHook(shutdownHook);
+        }
     }
 
     private void unregisterAllAndClose() {
         try {
+            if (shutdownHook != null) {
+                Runtime.getRuntime().removeShutdownHook(shutdownHook);
+                shutdownHook = null;
+            }
             for (Subscription sub : subscriptions) {
                 if (sub.isValid()) {
                     sub.unsubscribe();
