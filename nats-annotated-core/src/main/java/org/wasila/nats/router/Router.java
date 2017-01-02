@@ -47,7 +47,11 @@ public class Router {
     private Thread shutdownHook;
 
     public Router() throws IOException, TimeoutException {
-        this(new ConnectionFactory(ConnectionFactory.DEFAULT_URL));
+        this(ConnectionFactory.DEFAULT_URL);
+    }
+
+    public Router(String url) throws IOException, TimeoutException {
+        this(new ConnectionFactory(url));
     }
 
     public Router(ConnectionFactory connectionFactory) throws IOException, TimeoutException {
