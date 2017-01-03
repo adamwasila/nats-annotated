@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeoutException;
 
-public class Router {
+public class Router implements AutoCloseable {
 
     private final Logger log = LoggerFactory.getLogger(Router.class);
 
@@ -118,6 +118,7 @@ public class Router {
         }
     }
 
+    @Override
     public void close() {
         unregisterAllAndClose();
     }
