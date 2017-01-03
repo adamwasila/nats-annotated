@@ -41,7 +41,7 @@ public class Router {
     private final Logger log = LoggerFactory.getLogger(Router.class);
 
     private final Connection connection;
-    private final ObjectMapper jsonMapper = new ObjectMapper();
+    private final ObjectMapper jsonMapper;
 
     private final List<Subscription> subscriptions;
     private Thread shutdownHook;
@@ -55,6 +55,7 @@ public class Router {
     }
 
     public Router(ConnectionFactory connectionFactory) throws IOException, TimeoutException {
+        this.jsonMapper = new ObjectMapper();
         this.connection = connectionFactory.createConnection();
         this.subscriptions = new ArrayList<>();
         registerCleanupTask();
