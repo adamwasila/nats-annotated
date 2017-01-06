@@ -72,7 +72,7 @@ public class Router implements AutoCloseable {
                                     throw new WrappingException(e);
                                 }
                             } else if (param.getAnnotation(ConnectionContext.class) != null) {
-                                return null;
+                                return connection;
                             } else if (param.getAnnotation(MessageContext.class) != null) {
                                 return msg;
                             }
