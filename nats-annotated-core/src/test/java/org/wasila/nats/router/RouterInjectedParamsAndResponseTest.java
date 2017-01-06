@@ -30,66 +30,77 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-public class RouterInjectedParamsTest extends RouterBaseTest {
+public class RouterInjectedParamsAndResponseTest extends RouterBaseTest {
 
     private static final String SUBJECT = "test-subject";
 
-    private static final String RESPONSE_HANDLER_ID = "TestInjectsResource::helloWorld";
-    private static final String RESPONSE_HANDLER_REVERSED_ID = "TestInjectsReversedResource::helloWorld";
+    private static final String RESPONSE_HANDLER_ID = "TestResource::helloWorld";
 
-    public RouterInjectedParamsTest() {
-    }
-
-    public class TestInjectsResource {
-
+    public class TestWithMessageAndConnectionResource {
         @Subscribe(subject = SUBJECT)
-        public DataDto nameIsIrrelevant(@MessageContext Message message, @ConnectionContext Connection connection, DataDto dataDto) {
+        public void notImportantName(@MessageContext Message message, @ConnectionContext Connection connection, DataDto dataDto) {
             addResponse(RESPONSE_HANDLER_ID, message, connection);
-            return dataDto;
         }
-
     }
 
     @Test
-    public void handleResourceWithInjectedContext() throws IOException, TimeoutException, NoSuchMethodException {
-        Router router = prepareRouter(TestInjectsResource.class);
+    public void createRouterForOneSubscriptionWithInjectsAndResponse() throws IOException, TimeoutException, NoSuchMethodException {
+        Router router = prepareRouter(TestWithMessageAndConnectionResource.class);
 
         currentHandler.onMessage(msg);
 
         router.close();
 
         verify(cn).subscribe(eq(SUBJECT), isNull(String.class), isA(MessageHandler.class));
-        verify(cn).publish(any(), any());
         verify(cn).close();
         verifyNoMoreInteractions(cn);
 
         validateResponse(RESPONSE_HANDLER_ID, 1, cn, msg);
     }
 
-    public class TestInjectsReversedResource {
-
+    public class TestWithMessageResource {
         @Subscribe(subject = SUBJECT)
-        public DataDto nameIsIrrelevant(@ConnectionContext Connection connection, @MessageContext Message message, DataDto dataDto) {
-            addResponse(RESPONSE_HANDLER_REVERSED_ID, message, connection);
-            return dataDto;
+        public void itIsReallyIrrelevantName(@MessageContext Message message, DataDto dataDto) {
+            addResponse(RESPONSE_HANDLER_ID, message, null);
         }
-
     }
 
     @Test
-    public void handleResourceWithInjectedContextReversed() throws IOException, TimeoutException, NoSuchMethodException {
-        Router router = prepareRouter(TestInjectsReversedResource.class);
+    public void createRouterForOneSubscriptionWithMessageAndResponse() throws IOException, TimeoutException, NoSuchMethodException {
+        Router router = prepareRouter(TestWithMessageResource.class);
 
         currentHandler.onMessage(msg);
 
         router.close();
 
         verify(cn).subscribe(eq(SUBJECT), isNull(String.class), isA(MessageHandler.class));
-        verify(cn).publish(any(), any());
         verify(cn).close();
         verifyNoMoreInteractions(cn);
 
-        validateResponse(RESPONSE_HANDLER_REVERSED_ID, 1, cn, msg);
+        validateResponse(RESPONSE_HANDLER_ID, 1, null, msg);
+    }
+
+    public class TestWithConnectionResource {
+        @Subscribe(subject = SUBJECT)
+        public void youShouldUseSomethingDescriptiveHere(@ConnectionContext Connection connection, DataDto dataDto) {
+            addResponse(RESPONSE_HANDLER_ID, null, connection);
+        }
+    }
+
+    @Test
+    public void createRouterForOneSubscriptionWithConnectionAndResponse() throws IOException, TimeoutException, NoSuchMethodException {
+        Router router = prepareRouter(TestWithConnectionResource.class);
+
+        currentHandler.onMessage(msg);
+
+        router.close();
+
+        verify(cn).subscribe(eq(SUBJECT), isNull(String.class), isA(MessageHandler.class));
+        verify(cn).close();
+        verifyNoMoreInteractions(cn);
+
+        validateResponse(RESPONSE_HANDLER_ID, 1, cn, null);
+
     }
 
 }
