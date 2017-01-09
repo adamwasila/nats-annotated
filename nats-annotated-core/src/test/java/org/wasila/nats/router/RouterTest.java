@@ -15,11 +15,7 @@
  */
 package org.wasila.nats.router;
 
-import io.nats.client.AsyncSubscription;
-import io.nats.client.Connection;
-import io.nats.client.ConnectionFactory;
 import io.nats.client.MessageHandler;
-import org.junit.Before;
 import org.junit.Test;
 import org.wasila.nats.annotation.QueueGroup;
 import org.wasila.nats.annotation.Subject;
@@ -30,21 +26,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.mockito.Mockito.*;
 
-public class RouterTest {
-
-    private ConnectionFactory cf;
-    private Connection cn;
-    private AsyncSubscription sub;
-
-    @Before
-    public void initializeTest() throws IOException, TimeoutException {
-        cf = mock(ConnectionFactory.class);
-        cn = mock(Connection.class);
-        sub = mock(AsyncSubscription.class);
-
-        when(cf.createConnection()).thenReturn(cn);
-        when(cn.subscribe(any(), any(), any())).thenReturn(sub);
-    }
+public class RouterTest extends RouterBaseTest {
 
     public static class TestResource {
         @Subscribe(subject = "test-subject")
