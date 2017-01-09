@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
     compile 'io.nats:jnats:0.7.3'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.6.3'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.8'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-all:1.10.19'
