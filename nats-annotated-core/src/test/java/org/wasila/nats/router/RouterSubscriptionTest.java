@@ -26,7 +26,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.mockito.Mockito.*;
 
-public class RouterTest extends RouterBaseTest {
+public class RouterSubscriptionTest extends RouterBaseTest {
 
     private static final String RESPONSE_HANDLER_ID = "TestResource::helloWorld";
 
