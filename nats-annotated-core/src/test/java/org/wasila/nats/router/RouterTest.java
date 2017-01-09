@@ -28,9 +28,12 @@ import static org.mockito.Mockito.*;
 
 public class RouterTest extends RouterBaseTest {
 
-    public static class TestResource {
+    private static final String RESPONSE_HANDLER_ID = "TestResource::helloWorld";
+
+    public class TestResource {
         @Subscribe(subject = "test-subject")
         public void helloWorld() {
+            addResponse(RESPONSE_HANDLER_ID, null, null);
         }
     }
 
@@ -44,12 +47,15 @@ public class RouterTest extends RouterBaseTest {
         verify(cn).subscribe(eq("test-subject"), isNull(String.class), isA(MessageHandler.class));
         verify(cn).close();
         verifyNoMoreInteractions(cn);
+
+        validateResponse(RESPONSE_HANDLER_ID, 0, null, null);
     }
 
     @Subject("base-subject")
-    public static class TestCompositeSubResource {
+    public class TestCompositeSubResource {
         @Subscribe(subject = "test-subject")
         public void helloWorld() {
+            addResponse(RESPONSE_HANDLER_ID, null, null);
         }
     }
 
@@ -63,12 +69,15 @@ public class RouterTest extends RouterBaseTest {
         verify(cn).subscribe(eq("base-subject.test-subject"), isNull(String.class), isA(MessageHandler.class));
         verify(cn).close();
         verifyNoMoreInteractions(cn);
+
+        validateResponse(RESPONSE_HANDLER_ID, 0, null, null);
     }
 
-    public static class TestQueueGroupResource {
+    public class TestQueueGroupResource {
         @Subscribe(subject = "test-subject")
         @QueueGroup("group1")
         public void helloWorld() {
+            addResponse(RESPONSE_HANDLER_ID, null, null);
         }
     }
 
@@ -82,6 +91,8 @@ public class RouterTest extends RouterBaseTest {
         verify(cn).subscribe(eq("test-subject"), eq("group1"), isA(MessageHandler.class));
         verify(cn).close();
         verifyNoMoreInteractions(cn);
+
+        validateResponse(RESPONSE_HANDLER_ID, 0, null, null);
     }
 
 }
