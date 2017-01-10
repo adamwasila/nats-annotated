@@ -17,8 +17,6 @@ package org.wasila.nats.router;
 
 import io.nats.client.MessageHandler;
 import org.junit.Test;
-import org.wasila.nats.annotation.QueueGroup;
-import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.annotation.Subscribe;
 
 import java.io.IOException;
@@ -38,7 +36,7 @@ public class RouterUnsubscribeTest extends RouterBaseTest {
     }
 
     @Test
-    public void createRouterWithSimplestSubscription() throws IOException, TimeoutException {
+    public void testUnsubscribeWithOneResourceMethod() throws IOException, TimeoutException {
         Router router = new Router(cf);
         router.register(new TestResource());
 
@@ -48,51 +46,31 @@ public class RouterUnsubscribeTest extends RouterBaseTest {
         verify(cn).close();
         verifyNoMoreInteractions(cn);
 
-        validateResponse(RESPONSE_HANDLER_ID, 0, null, null);
-    }
+        verify(sub).isValid();
+        verify(sub).unsubscribe();
+        verifyNoMoreInteractions(sub);
 
-    @Subject("base-subject")
-    public class TestCompositeSubResource {
-        @Subscribe(subject = "test-subject")
-        public void helloWorld() {
-            addResponse(RESPONSE_HANDLER_ID, null, null);
-        }
+        validateResponse(RESPONSE_HANDLER_ID, 0, null, null);
     }
 
     @Test
-    public void createRouterWithCompositeSubscription() throws IOException, TimeoutException {
+    public void testUnsubscribeThenSubscribeAgain() throws IOException, TimeoutException {
         Router router = new Router(cf);
-        router.register(new TestCompositeSubResource());
-
+        router.register(new TestResource());
+        router.close();
+        router.register(new TestResource());
         router.close();
 
-        verify(cn).subscribe(eq("base-subject.test-subject"), isNull(String.class), isA(MessageHandler.class));
-        verify(cn).close();
+        verify(cn, times(2)).subscribe(eq("test-subject"), isNull(String.class), isA(MessageHandler.class));
+        verify(cn, times(2)).close();
         verifyNoMoreInteractions(cn);
+
+        verify(sub, times(2)).isValid();
+        verify(sub, times(2)).unsubscribe();
+        verifyNoMoreInteractions(sub);
 
         validateResponse(RESPONSE_HANDLER_ID, 0, null, null);
     }
 
-    public class TestQueueGroupResource {
-        @Subscribe(subject = "test-subject")
-        @QueueGroup("group1")
-        public void helloWorld() {
-            addResponse(RESPONSE_HANDLER_ID, null, null);
-        }
-    }
-
-    @Test
-    public void createRouterWithQueueGroupSubscription() throws IOException, TimeoutException {
-        Router router = new Router(cf);
-        router.register(new TestQueueGroupResource());
-
-        router.close();
-
-        verify(cn).subscribe(eq("test-subject"), eq("group1"), isA(MessageHandler.class));
-        verify(cn).close();
-        verifyNoMoreInteractions(cn);
-
-        validateResponse(RESPONSE_HANDLER_ID, 0, null, null);
-    }
 
 }

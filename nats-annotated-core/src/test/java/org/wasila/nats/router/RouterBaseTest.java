@@ -78,6 +78,8 @@ public class RouterBaseTest {
             return sub;
         });
 
+        when(sub.isValid()).thenReturn(true);
+
         when(msg.getData()).thenReturn(("{\"data\":\"\"}").getBytes());
     }
 
