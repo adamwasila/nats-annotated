@@ -147,6 +147,7 @@ public class Router implements AutoCloseable {
                     sub.unsubscribe();
                 }
             }
+            subscriptions.clear();
             connection.close();
         } catch (IOException e) {
             log.error("Unsubscribe failed", e);
