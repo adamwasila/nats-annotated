@@ -41,14 +41,9 @@ public class RouterSubscriptionTest extends RouterBaseTest {
     public void createRouterWithSimplestSubscription() throws IOException, TimeoutException, NoSubscriptionException {
         Router router = new Router(cf);
         router.register(new TestResource());
-
         router.close();
 
         verify(cn).subscribe(eq("test-subject"), isNull(String.class), isA(MessageHandler.class));
-        verify(cn).close();
-        verifyNoMoreInteractions(cn);
-
-        validateResponse(RESPONSE_HANDLER_ID, 0, null, null);
     }
 
     @Subject("base-subject")
@@ -63,14 +58,9 @@ public class RouterSubscriptionTest extends RouterBaseTest {
     public void createRouterWithCompositeSubscription() throws IOException, TimeoutException, NoSubscriptionException {
         Router router = new Router(cf);
         router.register(new TestCompositeSubResource());
-
         router.close();
 
         verify(cn).subscribe(eq("base-subject.test-subject"), isNull(String.class), isA(MessageHandler.class));
-        verify(cn).close();
-        verifyNoMoreInteractions(cn);
-
-        validateResponse(RESPONSE_HANDLER_ID, 0, null, null);
     }
 
     public class TestQueueGroupResource {
@@ -85,14 +75,9 @@ public class RouterSubscriptionTest extends RouterBaseTest {
     public void createRouterWithQueueGroupSubscription() throws IOException, TimeoutException, NoSubscriptionException {
         Router router = new Router(cf);
         router.register(new TestQueueGroupResource());
-
         router.close();
 
         verify(cn).subscribe(eq("test-subject"), eq("group1"), isA(MessageHandler.class));
-        verify(cn).close();
-        verifyNoMoreInteractions(cn);
-
-        validateResponse(RESPONSE_HANDLER_ID, 0, null, null);
     }
 
     public class TestEmptyResource {

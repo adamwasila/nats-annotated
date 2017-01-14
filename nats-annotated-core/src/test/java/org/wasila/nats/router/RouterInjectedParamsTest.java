@@ -17,7 +17,6 @@ package org.wasila.nats.router;
 
 import io.nats.client.Connection;
 import io.nats.client.Message;
-import io.nats.client.MessageHandler;
 import org.junit.Test;
 import org.wasila.nats.annotation.ConnectionContext;
 import org.wasila.nats.annotation.MessageContext;
@@ -26,19 +25,12 @@ import org.wasila.nats.annotation.Subscribe;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-
 public class RouterInjectedParamsTest extends RouterBaseTest {
 
     private static final String SUBJECT = "test-subject";
 
     private static final String RESPONSE_HANDLER_ID = "TestInjectsResource::helloWorld";
     private static final String RESPONSE_HANDLER_REVERSED_ID = "TestInjectsReversedResource::helloWorld";
-
-    public RouterInjectedParamsTest() {
-    }
 
     public class TestInjectsResource {
 
@@ -53,15 +45,8 @@ public class RouterInjectedParamsTest extends RouterBaseTest {
     @Test
     public void handleResourceWithInjectedContext() throws IOException, TimeoutException, NoSuchMethodException {
         Router router = prepareRouter(TestInjectsResource.class);
-
         currentHandler.onMessage(msg);
-
         router.close();
-
-        verify(cn).subscribe(eq(SUBJECT), isNull(String.class), isA(MessageHandler.class));
-        verify(cn).publish(any(), any());
-        verify(cn).close();
-        verifyNoMoreInteractions(cn);
 
         validateResponse(RESPONSE_HANDLER_ID, 1, cn, msg);
     }
@@ -79,15 +64,8 @@ public class RouterInjectedParamsTest extends RouterBaseTest {
     @Test
     public void handleResourceWithInjectedContextReversed() throws IOException, TimeoutException, NoSuchMethodException {
         Router router = prepareRouter(TestInjectsReversedResource.class);
-
         currentHandler.onMessage(msg);
-
         router.close();
-
-        verify(cn).subscribe(eq(SUBJECT), isNull(String.class), isA(MessageHandler.class));
-        verify(cn).publish(any(), any());
-        verify(cn).close();
-        verifyNoMoreInteractions(cn);
 
         validateResponse(RESPONSE_HANDLER_REVERSED_ID, 1, cn, msg);
     }
