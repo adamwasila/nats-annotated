@@ -20,13 +20,14 @@ import org.junit.Test;
 import org.wasila.nats.annotation.QueueGroup;
 import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.annotation.Subscribe;
+import org.wasila.nats.router.base.TestBase;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 import static org.mockito.Mockito.*;
 
-public class RouterSubscriptionTest extends RouterBaseTest {
+public class RouterSubscriptionTest extends TestBase {
 
     private static final String RESPONSE_HANDLER_ID = "TestResource::helloWorld";
 

@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.wasila.nats.annotation.ConnectionContext;
 import org.wasila.nats.annotation.MessageContext;
 import org.wasila.nats.annotation.Subscribe;
+import org.wasila.nats.router.base.TestBase;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -30,7 +31,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-public class RouterInjectedParamsAndResponseTest extends RouterBaseTest {
+public class RouterInjectedParamsAndResponseTest extends TestBase {
 
     private static final String SUBJECT = "test-subject";
 

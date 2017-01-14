@@ -21,11 +21,12 @@ import org.junit.Test;
 import org.wasila.nats.annotation.ConnectionContext;
 import org.wasila.nats.annotation.MessageContext;
 import org.wasila.nats.annotation.Subscribe;
+import org.wasila.nats.router.base.TestBase;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-public class RouterInjectedParamsTest extends RouterBaseTest {
+public class RouterInjectedParamsTest extends TestBase {
 
     private static final String SUBJECT = "test-subject";
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wasila.nats.router;
+package org.wasila.nats.router.base;
 
 import io.nats.client.AsyncSubscription;
 import io.nats.client.Connection;
@@ -21,6 +21,7 @@ import io.nats.client.ConnectionFactory;
 import io.nats.client.Message;
 import io.nats.client.MessageHandler;
 import org.junit.Before;
+import org.wasila.nats.router.Router;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RouterBaseTest {
+public class TestBase {
 
     protected ConnectionFactory cf;
     protected Connection cn;

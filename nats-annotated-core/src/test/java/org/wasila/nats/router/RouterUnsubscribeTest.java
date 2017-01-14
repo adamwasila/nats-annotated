@@ -18,13 +18,14 @@ package org.wasila.nats.router;
 import io.nats.client.MessageHandler;
 import org.junit.Test;
 import org.wasila.nats.annotation.Subscribe;
+import org.wasila.nats.router.base.TestBase;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 import static org.mockito.Mockito.*;
 
-public class RouterUnsubscribeTest extends RouterBaseTest {
+public class RouterUnsubscribeTest extends TestBase {
 
     private static final String RESPONSE_HANDLER_ID = "TestResource::helloWorld";
 
