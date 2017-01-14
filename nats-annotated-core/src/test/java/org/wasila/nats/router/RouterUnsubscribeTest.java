@@ -36,7 +36,7 @@ public class RouterUnsubscribeTest extends RouterBaseTest {
     }
 
     @Test
-    public void testUnsubscribeWithOneResourceMethod() throws IOException, TimeoutException {
+    public void testUnsubscribeWithOneResourceMethod() throws IOException, TimeoutException, NoSubscriptionException {
         Router router = new Router(cf);
         router.register(new TestResource());
 
@@ -54,7 +54,7 @@ public class RouterUnsubscribeTest extends RouterBaseTest {
     }
 
     @Test
-    public void testUnsubscribeThenSubscribeAgain() throws IOException, TimeoutException {
+    public void testUnsubscribeThenSubscribeAgain() throws IOException, TimeoutException, NoSubscriptionException {
         Router router = new Router(cf);
         router.register(new TestResource());
         router.close();

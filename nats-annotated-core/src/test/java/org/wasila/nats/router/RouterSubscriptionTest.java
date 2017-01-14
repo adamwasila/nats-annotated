@@ -38,7 +38,7 @@ public class RouterSubscriptionTest extends RouterBaseTest {
     }
 
     @Test
-    public void createRouterWithSimplestSubscription() throws IOException, TimeoutException {
+    public void createRouterWithSimplestSubscription() throws IOException, TimeoutException, NoSubscriptionException {
         Router router = new Router(cf);
         router.register(new TestResource());
 
@@ -60,7 +60,7 @@ public class RouterSubscriptionTest extends RouterBaseTest {
     }
 
     @Test
-    public void createRouterWithCompositeSubscription() throws IOException, TimeoutException {
+    public void createRouterWithCompositeSubscription() throws IOException, TimeoutException, NoSubscriptionException {
         Router router = new Router(cf);
         router.register(new TestCompositeSubResource());
 
@@ -82,7 +82,7 @@ public class RouterSubscriptionTest extends RouterBaseTest {
     }
 
     @Test
-    public void createRouterWithQueueGroupSubscription() throws IOException, TimeoutException {
+    public void createRouterWithQueueGroupSubscription() throws IOException, TimeoutException, NoSubscriptionException {
         Router router = new Router(cf);
         router.register(new TestQueueGroupResource());
 
@@ -93,6 +93,23 @@ public class RouterSubscriptionTest extends RouterBaseTest {
         verifyNoMoreInteractions(cn);
 
         validateResponse(RESPONSE_HANDLER_ID, 0, null, null);
+    }
+
+    public class TestEmptyResource {
+        public void helloWorld() {
+
+        }
+    }
+
+
+    @Test(expected=NoSubscriptionException.class)
+    public void registerResourceWithNoResourceMethods() throws IOException, TimeoutException, NoSubscriptionException {
+        Router router = new Router(cf);
+        try {
+            router.register(new TestEmptyResource());
+        } finally {
+            router.close();
+        }
     }
 
 }

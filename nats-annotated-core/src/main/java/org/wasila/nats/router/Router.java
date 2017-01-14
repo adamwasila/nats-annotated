@@ -95,11 +95,16 @@ public class Router implements AutoCloseable {
         subscriptions.add(subscription);
     }
 
-    public void register(Object object) {
+    public void register(Object object) throws NoSubscriptionException {
         List<Method> subscribeMethod = getMethodsAnnotatedWith(object.getClass(), Subscribe.class);
         Subject classSubject = object.getClass().getAnnotation(Subject.class);
         String subjectPrefix = classSubject != null ? classSubject.value() : null;
         log.info("Registering " + subscribeMethod.size() + " methods");
+
+        if (subscribeMethod.size() == 0) {
+            throw new NoSubscriptionException("No registrable methods in resource");
+        }
+
         for (Method method : subscribeMethod) {
             StringJoiner subjectJoiner = new StringJoiner(".");
 
