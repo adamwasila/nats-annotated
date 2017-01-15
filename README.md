@@ -13,8 +13,8 @@ https://github.com/cloudfoundry-community/java-nats/tree/master/client-spring
 
   * finalize API and remove code shortcuts and all bad code
   * add proper exception handling
-  * integrate logging
-  * add composite subjects
-  * support request-reply pattern
+  * ~~integrate logging~~
+  * ~~add composite subjects~~
+  * ~~support request-reply pattern~~
   * make it messaging technology agnostic (pluggable?) to support other msg buses, eg. RabbitMQ
   * dropwizard bundle to ease configuration and integration with dropwizard framework
