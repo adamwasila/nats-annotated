@@ -20,6 +20,7 @@ import io.nats.client.Message;
 import org.junit.Test;
 import org.wasila.nats.annotation.ConnectionContext;
 import org.wasila.nats.annotation.MessageContext;
+import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.annotation.Subscribe;
 import org.wasila.nats.router.base.TestBase;
 
@@ -35,7 +36,8 @@ public class RouterInjectedParamsTest extends TestBase {
 
     public class TestInjectsResource {
 
-        @Subscribe(subject = SUBJECT)
+        @Subscribe
+        @Subject(SUBJECT)
         public DataDto nameIsIrrelevant(@MessageContext Message message, @ConnectionContext Connection connection, DataDto dataDto) {
             addResponse(RESPONSE_HANDLER_ID, message, connection);
             return dataDto;
@@ -54,7 +56,8 @@ public class RouterInjectedParamsTest extends TestBase {
 
     public class TestInjectsReversedResource {
 
-        @Subscribe(subject = SUBJECT)
+        @Subscribe
+        @Subject(SUBJECT)
         public DataDto nameIsIrrelevant(@ConnectionContext Connection connection, @MessageContext Message message, DataDto dataDto) {
             addResponse(RESPONSE_HANDLER_REVERSED_ID, message, connection);
             return dataDto;

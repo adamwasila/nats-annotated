@@ -17,6 +17,7 @@ package org.wasila.nats.router;
 
 import io.nats.client.MessageHandler;
 import org.junit.Test;
+import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.annotation.Subscribe;
 import org.wasila.nats.router.base.TestBase;
 
@@ -30,7 +31,8 @@ public class RouterUnsubscribeTest extends TestBase {
     private static final String RESPONSE_HANDLER_ID = "TestResource::helloWorld";
 
     public class TestResource {
-        @Subscribe(subject = "test-subject")
+        @Subscribe
+        @Subject("test-subject")
         public void helloWorld() {
             addResponse(RESPONSE_HANDLER_ID, null, null);
         }

@@ -112,9 +112,10 @@ public class Router implements AutoCloseable {
                 subjectJoiner.add(subjectPrefix);
             }
 
-            Subscribe methodSubject = method.getAnnotation(Subscribe.class);
-            if (!methodSubject.subject().isEmpty()) {
-                subjectJoiner.add(methodSubject.subject());
+            Subject methodSubject = method.getAnnotation(Subject.class);
+
+            if (methodSubject != null) {
+                subjectJoiner.add(methodSubject.value());
             }
             QueueGroup queueGroup = method.getAnnotation(QueueGroup.class);
             String queueGroupValue = queueGroup != null ? queueGroup.value() : null;

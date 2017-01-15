@@ -21,6 +21,7 @@ import io.nats.client.MessageHandler;
 import org.junit.Test;
 import org.wasila.nats.annotation.ConnectionContext;
 import org.wasila.nats.annotation.MessageContext;
+import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.annotation.Subscribe;
 import org.wasila.nats.router.base.TestBase;
 
@@ -38,7 +39,8 @@ public class RouterInjectedParamsAndResponseTest extends TestBase {
     private static final String RESPONSE_HANDLER_ID = "TestResource::helloWorld";
 
     public class TestWithMessageAndConnectionResource {
-        @Subscribe(subject = SUBJECT)
+        @Subscribe
+        @Subject(SUBJECT)
         public void notImportantName(@MessageContext Message message, @ConnectionContext Connection connection, DataDto dataDto) {
             addResponse(RESPONSE_HANDLER_ID, message, connection);
         }
@@ -60,7 +62,8 @@ public class RouterInjectedParamsAndResponseTest extends TestBase {
     }
 
     public class TestWithMessageResource {
-        @Subscribe(subject = SUBJECT)
+        @Subscribe
+        @Subject(SUBJECT)
         public void itIsReallyIrrelevantName(@MessageContext Message message, DataDto dataDto) {
             addResponse(RESPONSE_HANDLER_ID, message, null);
         }
@@ -82,7 +85,8 @@ public class RouterInjectedParamsAndResponseTest extends TestBase {
     }
 
     public class TestWithConnectionResource {
-        @Subscribe(subject = SUBJECT)
+        @Subscribe
+        @Subject(SUBJECT)
         public void youShouldUseSomethingDescriptiveHere(@ConnectionContext Connection connection, DataDto dataDto) {
             addResponse(RESPONSE_HANDLER_ID, null, connection);
         }

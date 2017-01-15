@@ -17,6 +17,7 @@ package org.wasila.nats.examples.pingpong;
 
 import org.wasila.nats.annotation.Publish;
 import org.wasila.nats.annotation.QueueGroup;
+import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.annotation.Subscribe;
 import org.wasila.nats.examples.pingpong.dto.Ping;
 import org.wasila.nats.examples.pingpong.dto.Pong;
@@ -43,7 +44,8 @@ public class Ponger {
             pongPublisher = Publisher.builder().target(PongPublisher.class, "nats://127.0.0.1:4222");
         }
 
-        @Subscribe(subject="ping")
+        @Subscribe
+        @Subject("ping")
         @QueueGroup("silna-grupa-pod-wezwaniem")
         public void getPing(Ping ping) {
             System.out.println("Ping received: " + ping);

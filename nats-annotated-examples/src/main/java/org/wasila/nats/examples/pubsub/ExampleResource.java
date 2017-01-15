@@ -16,12 +16,14 @@
 package org.wasila.nats.examples.pubsub;
 
 import org.wasila.nats.annotation.QueueGroup;
+import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.annotation.Subscribe;
 import org.wasila.nats.examples.pubsub.dto.Hello;
 
 public class ExampleResource {
 
-    @Subscribe(subject="somesubject")
+    @Subscribe
+    @Subject("somesubject")
     @QueueGroup("group1")
     public void test(Hello hello) {
         System.out.println("Received message: " + hello);

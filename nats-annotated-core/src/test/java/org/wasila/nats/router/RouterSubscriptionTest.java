@@ -67,7 +67,8 @@ public class RouterSubscriptionTest extends TestBase {
     }
 
     public class TestQueueGroupResource {
-        @Subscribe(subject = "test-subject")
+        @Subscribe
+        @Subject("test-subject")
         @QueueGroup("group1")
         public void helloWorld() {
             addResponse(RESPONSE_HANDLER_ID, null, null);

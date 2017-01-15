@@ -15,6 +15,7 @@
  */
 package org.wasila.nats.examples.reply;
 
+import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.annotation.Subscribe;
 import org.wasila.nats.examples.reply.dto.Reply;
 import org.wasila.nats.examples.reply.dto.Request;
@@ -28,7 +29,8 @@ public class ReplierExample {
 
     public static class ReplierResource {
 
-        @Subscribe(subject="foobar")
+        @Subscribe
+        @Subject("foobar")
         public Reply handleReply(Request request) {
             System.out.println("Received request: " + request);
             return new Reply("hi!");
