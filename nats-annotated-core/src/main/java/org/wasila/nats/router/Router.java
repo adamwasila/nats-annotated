@@ -131,12 +131,9 @@ public class Router implements AutoCloseable {
 
     private void registerCleanupTask() {
         if (this.shutdownHook == null) {
-            this.shutdownHook = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    log.debug("Starting cleanup task");
-                    unregisterAllAndClose();
-                }
+            this.shutdownHook = new Thread(() -> {
+                log.debug("Starting cleanup task");
+                unregisterAllAndClose();
             });
             Runtime.getRuntime().addShutdownHook(shutdownHook);
         }
