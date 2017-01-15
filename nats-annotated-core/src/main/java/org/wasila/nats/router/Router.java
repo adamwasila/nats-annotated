@@ -95,7 +95,7 @@ public class Router implements AutoCloseable {
         subscriptions.add(subscription);
     }
 
-    public void register(Object object) throws NoSubscriptionException {
+    public void register(Object object) {
         List<Method> subscribeMethod = getMethodsAnnotatedWith(object.getClass(), Subscribe.class);
         Subject classSubject = object.getClass().getAnnotation(Subject.class);
         String subjectPrefix = classSubject != null ? classSubject.value() : null;

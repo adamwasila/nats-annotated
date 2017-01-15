@@ -15,7 +15,7 @@
  */
 package org.wasila.nats.router;
 
-public class NoSubscriptionException extends Exception {
+public class NoSubscriptionException extends RuntimeException {
     public NoSubscriptionException() {
         super();
     }

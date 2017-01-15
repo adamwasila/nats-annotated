@@ -32,14 +32,15 @@ public class RouterSubscriptionTest extends TestBase {
     private static final String RESPONSE_HANDLER_ID = "TestResource::helloWorld";
 
     public class TestResource {
-        @Subscribe(subject = "test-subject")
+        @Subscribe
+        @Subject("test-subject")
         public void helloWorld() {
             addResponse(RESPONSE_HANDLER_ID, null, null);
         }
     }
 
     @Test
-    public void createRouterWithSimplestSubscription() throws IOException, TimeoutException, NoSubscriptionException {
+    public void createRouterWithSimplestSubscription() throws IOException, TimeoutException {
         Router router = new Router(cf);
         router.register(new TestResource());
         router.close();
@@ -49,14 +50,15 @@ public class RouterSubscriptionTest extends TestBase {
 
     @Subject("base-subject")
     public class TestCompositeSubResource {
-        @Subscribe(subject = "test-subject")
+        @Subscribe
+        @Subject("test-subject")
         public void helloWorld() {
             addResponse(RESPONSE_HANDLER_ID, null, null);
         }
     }
 
     @Test
-    public void createRouterWithCompositeSubscription() throws IOException, TimeoutException, NoSubscriptionException {
+    public void createRouterWithCompositeSubscription() throws IOException, TimeoutException {
         Router router = new Router(cf);
         router.register(new TestCompositeSubResource());
         router.close();
@@ -73,7 +75,7 @@ public class RouterSubscriptionTest extends TestBase {
     }
 
     @Test
-    public void createRouterWithQueueGroupSubscription() throws IOException, TimeoutException, NoSubscriptionException {
+    public void createRouterWithQueueGroupSubscription() throws IOException, TimeoutException {
         Router router = new Router(cf);
         router.register(new TestQueueGroupResource());
         router.close();
@@ -89,7 +91,7 @@ public class RouterSubscriptionTest extends TestBase {
 
 
     @Test(expected=NoSubscriptionException.class)
-    public void registerResourceWithNoResourceMethods() throws IOException, TimeoutException, NoSubscriptionException {
+    public void registerResourceWithNoResourceMethods() throws IOException, TimeoutException {
         Router router = new Router(cf);
         try {
             router.register(new TestEmptyResource());
