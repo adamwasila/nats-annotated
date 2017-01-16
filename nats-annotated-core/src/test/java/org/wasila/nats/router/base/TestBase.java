@@ -49,6 +49,7 @@ public class TestBase {
         protected int count;
         protected Message lastMessage;
         protected Connection lastConnection;
+        protected Object[] lastParams;
     }
 
     protected Map<String,HandlerResponse> responses;
@@ -58,6 +59,14 @@ public class TestBase {
         handlerResponse.count++;
         handlerResponse.lastMessage = message;
         handlerResponse.lastConnection = connection;
+    }
+
+    protected void addResponse(String name, Message message, Connection connection, Object... params) {
+        HandlerResponse handlerResponse = responses.computeIfAbsent(name, s -> new HandlerResponse() );
+        handlerResponse.count++;
+        handlerResponse.lastMessage = message;
+        handlerResponse.lastConnection = connection;
+        handlerResponse.lastParams = params;
     }
 
     protected HandlerResponse getResponse(String name) {
@@ -82,6 +91,7 @@ public class TestBase {
         when(sub.isValid()).thenReturn(true);
 
         when(msg.getData()).thenReturn(("{\"data\":\"\"}").getBytes());
+        when(msg.getSubject()).thenReturn("some-subject");
     }
 
     public static class DataDto {
@@ -131,6 +141,15 @@ public class TestBase {
         assertThat(response.count, equalTo(count));
         assertThat(response.lastConnection, equalTo(cn));
         assertThat(response.lastMessage, equalTo(msg));
+    }
+
+    protected void validateResponse(String handlerId, int count, Connection cn, Message msg, Object... params) {
+        HandlerResponse response = getResponse(handlerId);
+        assertThat(response.count, equalTo(count));
+        assertThat(response.lastConnection, equalTo(cn));
+        assertThat(response.lastMessage, equalTo(msg));
+        assertThat(response.lastParams, notNullValue(Object[].class));
+        assertThat(response.lastParams, equalTo(params));
     }
 
 }

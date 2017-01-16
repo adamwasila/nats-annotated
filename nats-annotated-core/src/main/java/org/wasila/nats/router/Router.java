@@ -25,6 +25,7 @@ import org.wasila.nats.annotation.ConnectionContext;
 import org.wasila.nats.annotation.MessageContext;
 import org.wasila.nats.annotation.QueueGroup;
 import org.wasila.nats.annotation.Subject;
+import org.wasila.nats.annotation.SubjectParam;
 import org.wasila.nats.annotation.Subscribe;
 
 import java.io.IOException;
@@ -32,9 +33,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Router implements AutoCloseable {
 
@@ -61,9 +66,35 @@ public class Router implements AutoCloseable {
         registerCleanupTask();
     }
 
-    private void addSubscription(String subject, String queueGroup, final Method method, final Object target) {
+    private void addSubscription(String baseSubject, String queueGroup, final Method method, final Object target) {
+        Map<Integer, String> subjectParams = new HashMap<>();
+
+        final String[] subjectBaseSegments = baseSubject.split("\\.");
+
+        String subject = IntStream.range(0, subjectBaseSegments.length)
+                .mapToObj(index -> {
+                    String s = subjectBaseSegments[index];
+                    if (s.startsWith("{") && s.endsWith("}")) {
+                        subjectParams.put(index, s.substring(1, s.length()-1));
+                        return "*";
+                    } else {
+                        return s;
+                    }
+                })
+                .collect(Collectors.joining("."));
+
         Subscription subscription = connection.subscribe(subject, queueGroup, msg -> {
             try {
+                String[] subjectSegments = msg.getSubject().split("\\.");
+
+                Map<String, String> paramsMapping = new HashMap<>();
+
+                for (Map.Entry<Integer, String> subjectParam : subjectParams.entrySet()) {
+                    String paramName = subjectParam.getValue();
+                    String paramValue = subjectSegments[subjectParam.getKey()];
+                    paramsMapping.put(paramName, paramValue);
+                }
+
                 Object[] params = Arrays.stream(method.getParameters()).map(param -> {
                             if (param.getAnnotations().length == 0) {
                                 try {
@@ -75,6 +106,11 @@ public class Router implements AutoCloseable {
                                 return connection;
                             } else if (param.getAnnotation(MessageContext.class) != null) {
                                 return msg;
+                            } else {
+                                SubjectParam subjectParam = param.getAnnotation(SubjectParam.class);
+                                if (subjectParam != null) {
+                                    return paramsMapping.get(subjectParam.value());
+                                }
                             }
                             return null;
                         }
@@ -119,6 +155,7 @@ public class Router implements AutoCloseable {
             }
             QueueGroup queueGroup = method.getAnnotation(QueueGroup.class);
             String queueGroupValue = queueGroup != null ? queueGroup.value() : null;
+
             addSubscription(subjectJoiner.toString(), queueGroupValue, method, object);
             log.info(" Method: " + method.getName() + ", Subject: " + subjectJoiner.toString());
         }
