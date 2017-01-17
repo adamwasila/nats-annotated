@@ -39,16 +39,11 @@ public class RouterSubscriptionWithParamsTest extends TestBase {
 
     @Test
     public void routerWithParametrizedSubscription() throws IOException, TimeoutException {
-        when(msg.getSubject()).thenReturn("test-subject.paramValue");
+        executeTest("test-subject.paramValue", new TestResource());
 
-        Router router = new Router(cf);
-        router.register(new TestResource());
-        currentHandler.onMessage(msg);
-        router.close();
+        verifyHandlerAndParams("test-subject.{param}", "paramValue");
 
-        verify(cn).subscribe(eq("test-subject.*"), isNull(String.class), isA(MessageHandler.class));
-
-        validateResponse2("test-subject.{param}", 1, new Object[] {"paramValue"});
+        verifyThatGivenSubjectWasSubscribed("test-subject.*");
     }
 
     public class TestTwiceResource {
@@ -57,21 +52,15 @@ public class RouterSubscriptionWithParamsTest extends TestBase {
         public void testSubject(@SubjectParam("param1") String param1, @SubjectParam("param2") String param2) {
             addResponseParamsOnly("test-subject.{param1}.and.{param2}", param1, param2);
         }
-
     }
 
     @Test
     public void routerWithParametrizedSubscriptionTwice() throws IOException, TimeoutException {
-        when(msg.getSubject()).thenReturn("test-subject.paramValue1.and.paramValue2");
+        executeTest("test-subject.paramValue1.and.paramValue2", new TestTwiceResource());
 
-        Router router = new Router(cf);
-        router.register(new TestTwiceResource());
-        currentHandler.onMessage(msg);
-        router.close();
+        verifyHandlerAndParams("test-subject.{param1}.and.{param2}", "paramValue1", "paramValue2");
 
-        verify(cn).subscribe(eq("test-subject.*.and.*"), isNull(String.class), isA(MessageHandler.class));
-
-        validateResponse2("test-subject.{param1}.and.{param2}", 1, new Object[] {"paramValue1", "paramValue2"});
+        verifyThatGivenSubjectWasSubscribed("test-subject.*.and.*");
     }
 
     public class TestTwiceSwitchedParamsResource {
@@ -84,16 +73,11 @@ public class RouterSubscriptionWithParamsTest extends TestBase {
 
     @Test
     public void routerWithParametrizedSubscriptionTwiceSwitchedParams() throws IOException, TimeoutException {
-        when(msg.getSubject()).thenReturn("test-subject.paramValue1.and.paramValue2");
+        executeTest("test-subject.paramValue1.and.paramValue2", new TestTwiceSwitchedParamsResource());
 
-        Router router = new Router(cf);
-        router.register(new TestTwiceSwitchedParamsResource());
-        currentHandler.onMessage(msg);
-        router.close();
+        verifyHandlerAndParams("test-subject.{param1}.and.{param2}", "paramValue1", "paramValue2");
 
-        verify(cn).subscribe(eq("test-subject.*.and.*"), isNull(String.class), isA(MessageHandler.class));
-
-        validateResponse2("test-subject.{param1}.and.{param2}", 1, new Object[] {"paramValue1", "paramValue2"});
+        verifyThatGivenSubjectWasSubscribed("test-subject.*.and.*");
     }
 
     public class TestResourceWithOnlyOneParamUsed {
@@ -106,18 +90,11 @@ public class RouterSubscriptionWithParamsTest extends TestBase {
 
     @Test
     public void routerWithParametrizedSubscriptionNotAllArgsUsed() throws IOException, TimeoutException {
-        when(msg.getSubject()).thenReturn("test-subject.paramValue1.and.paramValue2");
+        executeTest("test-subject.paramValue1.and.paramValue2", new TestResourceWithOnlyOneParamUsed());
 
-        Router router = new Router(cf);
-        router.register(new TestResourceWithOnlyOneParamUsed());
+        verifyHandlerAndParams("testSubjectSwitchedOnlyFirstParam", "paramValue1");
 
-        currentHandler.onMessage(msg);
-        validateResponse2("testSubjectSwitchedOnlyFirstParam", 1, new Object[] {"paramValue1"});
-
-        router.close();
-
-        verify(cn).subscribe(eq("test-subject.*.and.*"), isNull(String.class), isA(MessageHandler.class));
-
+        verifyThatGivenSubjectWasSubscribed("test-subject.*.and.*");
     }
 
     @Subject("main-subject.{param0}.other-subject")
@@ -127,22 +104,35 @@ public class RouterSubscriptionWithParamsTest extends TestBase {
         public void testSubject(@SubjectParam("param0") String param0, @SubjectParam("param1") String param1) {
             addResponseParamsOnly("testSubject", param0, param1);
         }
+
     }
 
     @Test
     public void routerWithComposedParametrizedSubject() throws IOException, TimeoutException {
-        when(msg.getSubject()).thenReturn("main-subject.param0-value.other-subject.test-subject.param1-value");
+        executeTest("main-subject.param0-value.other-subject.test-subject.param1-value", new TestResourceWithParametrizedComposedSubject());
+
+        verifyHandlerAndParams("testSubject", "param0-value", "param1-value");
+
+        verifyThatGivenSubjectWasSubscribed("main-subject.*.other-subject.test-subject.*");
+    }
+
+    protected void executeTest(String messageSubject, Object resourceInstance) throws IOException, TimeoutException {
+        when(msg.getSubject()).thenReturn(messageSubject);
 
         Router router = new Router(cf);
-        router.register(new TestResourceWithParametrizedComposedSubject());
+        router.register(resourceInstance);
 
         currentHandler.onMessage(msg);
-        validateResponse2("testSubject", 1, new Object[] {"param0-value", "param1-value"});
 
         router.close();
+    }
 
-        verify(cn).subscribe(eq("main-subject.*.other-subject.test-subject.*"), isNull(String.class), isA(MessageHandler.class));
+    protected void verifyHandlerAndParams(String handlerMessage, Object... params) {
+        validateResponse2(handlerMessage, 1, params);
+    }
 
+    protected void verifyThatGivenSubjectWasSubscribed(String subject) {
+        verify(cn).subscribe(eq(subject), isNull(String.class), isA(MessageHandler.class));
     }
 
 }
