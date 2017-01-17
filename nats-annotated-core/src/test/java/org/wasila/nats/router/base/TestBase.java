@@ -69,6 +69,14 @@ public class TestBase {
         handlerResponse.lastParams = params;
     }
 
+    protected void addResponseParamsOnly(String name, Object... params) {
+        HandlerResponse handlerResponse = responses.computeIfAbsent(name, s -> new HandlerResponse() );
+        handlerResponse.count++;
+        handlerResponse.lastMessage = null;
+        handlerResponse.lastConnection = null;
+        handlerResponse.lastParams = params;
+    }
+
     protected HandlerResponse getResponse(String name) {
         return responses.computeIfAbsent(name, s -> new HandlerResponse() );
     }
@@ -148,6 +156,13 @@ public class TestBase {
         assertThat(response.count, equalTo(count));
         assertThat(response.lastConnection, equalTo(cn));
         assertThat(response.lastMessage, equalTo(msg));
+        assertThat(response.lastParams, notNullValue(Object[].class));
+        assertThat(response.lastParams, equalTo(params));
+    }
+
+    protected void validateResponse2(String handlerId, int count, Object... params) {
+        HandlerResponse response = getResponse(handlerId);
+        assertThat(response.count, equalTo(count));
         assertThat(response.lastParams, notNullValue(Object[].class));
         assertThat(response.lastParams, equalTo(params));
     }

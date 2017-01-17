@@ -33,7 +33,7 @@ public class RouterSubscriptionWithParamsTest extends TestBase {
         @Subscribe
         @Subject("test-subject.{param}")
         public void testSubject(@SubjectParam("param") String param) {
-            addResponse("test-subject.{param}", null, null, param);
+            addResponseParamsOnly("test-subject.{param}", param);
         }
     }
 
@@ -48,14 +48,14 @@ public class RouterSubscriptionWithParamsTest extends TestBase {
 
         verify(cn).subscribe(eq("test-subject.*"), isNull(String.class), isA(MessageHandler.class));
 
-        validateResponse("test-subject.{param}", 1, null, null, new Object[] {"paramValue"});
+        validateResponse2("test-subject.{param}", 1, new Object[] {"paramValue"});
     }
 
     public class TestTwiceResource {
         @Subscribe
         @Subject("test-subject.{param1}.and.{param2}")
         public void testSubject(@SubjectParam("param1") String param1, @SubjectParam("param2") String param2) {
-            addResponse("test-subject.{param1}.and.{param2}", null, null, param1, param2);
+            addResponseParamsOnly("test-subject.{param1}.and.{param2}", param1, param2);
         }
 
     }
@@ -71,7 +71,7 @@ public class RouterSubscriptionWithParamsTest extends TestBase {
 
         verify(cn).subscribe(eq("test-subject.*.and.*"), isNull(String.class), isA(MessageHandler.class));
 
-        validateResponse("test-subject.{param1}.and.{param2}", 1, null, null, new Object[] {"paramValue1", "paramValue2"});
+        validateResponse2("test-subject.{param1}.and.{param2}", 1, new Object[] {"paramValue1", "paramValue2"});
     }
 
     public class TestTwiceSwitchedParamsResource {
@@ -93,14 +93,14 @@ public class RouterSubscriptionWithParamsTest extends TestBase {
 
         verify(cn).subscribe(eq("test-subject.*.and.*"), isNull(String.class), isA(MessageHandler.class));
 
-        validateResponse("test-subject.{param1}.and.{param2}", 1, null, null, new Object[] {"paramValue1", "paramValue2"});
+        validateResponse2("test-subject.{param1}.and.{param2}", 1, new Object[] {"paramValue1", "paramValue2"});
     }
 
     public class TestResourceWithOnlyOneParamUsed {
         @Subscribe
         @Subject("test-subject.{param1}.and.{param2}")
         public void testSubjectSwitchedOnlyFirstParam(@SubjectParam("param1") String param1) {
-            addResponse("testSubjectSwitchedOnlyFirstParam", null, null, param1);
+            addResponseParamsOnly("testSubjectSwitchedOnlyFirstParam", param1);
         }
     }
 
@@ -112,7 +112,7 @@ public class RouterSubscriptionWithParamsTest extends TestBase {
         router.register(new TestResourceWithOnlyOneParamUsed());
 
         currentHandler.onMessage(msg);
-        validateResponse("testSubjectSwitchedOnlyFirstParam", 1, null, null, new Object[] {"paramValue1"});
+        validateResponse2("testSubjectSwitchedOnlyFirstParam", 1, new Object[] {"paramValue1"});
 
         router.close();
 
@@ -125,7 +125,7 @@ public class RouterSubscriptionWithParamsTest extends TestBase {
         @Subscribe
         @Subject("test-subject.{param1}")
         public void testSubject(@SubjectParam("param0") String param0, @SubjectParam("param1") String param1) {
-            addResponse("testSubject", null, null, param0, param1);
+            addResponseParamsOnly("testSubject", param0, param1);
         }
     }
 
@@ -137,7 +137,7 @@ public class RouterSubscriptionWithParamsTest extends TestBase {
         router.register(new TestResourceWithParametrizedComposedSubject());
 
         currentHandler.onMessage(msg);
-        validateResponse("testSubject", 1, null, null, new Object[] {"param0-value", "param1-value"});
+        validateResponse2("testSubject", 1, new Object[] {"param0-value", "param1-value"});
 
         router.close();
 
