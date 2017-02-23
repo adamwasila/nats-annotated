@@ -1,0 +1,18 @@
+version 'unspecified'
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+project.ext {
+    dropwizardVersion = '1.0.5'
+}
+
+dependencies {
+    compile project(':nats-annotated-core')
+    compile 'io.dropwizard:dropwizard-core:' + dropwizardVersion
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}

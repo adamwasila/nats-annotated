@@ -2,3 +2,6 @@ rootProject.name = 'nats-annotated'
 
 include ':nats-annotated-core'
 include ':nats-annotated-examples'
+
+include 'nats-annotated-dropwizard'
+
