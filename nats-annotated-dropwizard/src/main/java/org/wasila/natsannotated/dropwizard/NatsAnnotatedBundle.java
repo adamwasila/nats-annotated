@@ -57,7 +57,11 @@ public abstract class NatsAnnotatedBundle<T extends Configuration> implements Ma
     public void start() throws Exception {
         this.router = new Router(String.format("nats://%s:%d", config.getHost(), config.getPort()));
         for (Object resource : resources) {
-            router.register(resource);
+            if (resource instanceof Class) {
+                router.register((Class<?>)resource);
+            } else {
+                router.register(resource);
+            }
         }
     }
 
