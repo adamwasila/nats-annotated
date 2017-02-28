@@ -49,9 +49,8 @@ public abstract class NatsAnnotatedBundle<T extends Configuration> implements Ma
         resources.add(resource);
     }
 
-    public void addResource(Class<?> resourceClass) throws IllegalAccessException, InstantiationException {
-        Object resource = resourceClass.newInstance();
-        resources.add(resource);
+    public void addResource(Class<?> resourceClass) {
+        resources.add(resourceClass);
     }
 
     @Override
