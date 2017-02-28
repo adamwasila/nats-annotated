@@ -43,9 +43,10 @@ public class RouterSubscriptionTest extends TestBase {
     public void createRouterWithSimplestSubscription() throws IOException, TimeoutException {
         Router router = new Router(cf);
         router.register(new TestResource());
+        router.register(TestResource.class);
         router.close();
 
-        verify(cn).subscribe(eq("test-subject"), isNull(String.class), isA(MessageHandler.class));
+        verify(cn, times(2)).subscribe(eq("test-subject"), isNull(String.class), isA(MessageHandler.class));
     }
 
     public class TestResourceSameSubject {
@@ -66,9 +67,10 @@ public class RouterSubscriptionTest extends TestBase {
     public void createRouterWithMultipleSubscription() throws IOException, TimeoutException {
         Router router = new Router(cf);
         router.register(new TestResourceSameSubject());
+        router.register(TestResourceSameSubject.class);
         router.close();
 
-        verify(cn, times(2)).subscribe(eq("test-subject"), isNull(String.class), isA(MessageHandler.class));
+        verify(cn, times(4)).subscribe(eq("test-subject"), isNull(String.class), isA(MessageHandler.class));
     }
 
     @Subject("test-base-subject")
@@ -83,9 +85,10 @@ public class RouterSubscriptionTest extends TestBase {
     public void createRouterWithSubscriptionWithNoSubject() throws IOException, TimeoutException {
         Router router = new Router(cf);
         router.register(new TestResourceNoSubject());
+        router.register(TestResourceNoSubject.class);
         router.close();
 
-        verify(cn).subscribe(eq("test-base-subject"), isNull(String.class), isA(MessageHandler.class));
+        verify(cn, times(2)).subscribe(eq("test-base-subject"), isNull(String.class), isA(MessageHandler.class));
     }
 
     @Subject("base-subject")
@@ -101,9 +104,10 @@ public class RouterSubscriptionTest extends TestBase {
     public void createRouterWithCompositeSubscription() throws IOException, TimeoutException {
         Router router = new Router(cf);
         router.register(new TestCompositeSubResource());
+        router.register(TestCompositeSubResource.class);
         router.close();
 
-        verify(cn).subscribe(eq("base-subject.test-subject"), isNull(String.class), isA(MessageHandler.class));
+        verify(cn, times(2)).subscribe(eq("base-subject.test-subject"), isNull(String.class), isA(MessageHandler.class));
     }
 
     public class TestQueueGroupResource {
@@ -119,9 +123,10 @@ public class RouterSubscriptionTest extends TestBase {
     public void createRouterWithQueueGroupSubscription() throws IOException, TimeoutException {
         Router router = new Router(cf);
         router.register(new TestQueueGroupResource());
+        router.register(TestQueueGroupResource.class);
         router.close();
 
-        verify(cn).subscribe(eq("test-subject"), eq("group1"), isA(MessageHandler.class));
+        verify(cn, times(2)).subscribe(eq("test-subject"), eq("group1"), isA(MessageHandler.class));
     }
 
     public class TestEmptyResource {
@@ -136,6 +141,16 @@ public class RouterSubscriptionTest extends TestBase {
         Router router = new Router(cf);
         try {
             router.register(new TestEmptyResource());
+        } finally {
+            router.close();
+        }
+    }
+
+    @Test(expected=NoSubscriptionException.class)
+    public void registerClassResourceWithNoResourceMethods() throws IOException, TimeoutException {
+        Router router = new Router(cf);
+        try {
+            router.register(TestEmptyResource.class);
         } finally {
             router.close();
         }
