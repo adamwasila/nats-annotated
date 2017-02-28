@@ -66,7 +66,11 @@ public class Router implements AutoCloseable {
         registerCleanupTask();
     }
 
-    private void addSubscription(String baseSubject, String queueGroup, final Method method, final Object target) {
+    private interface TargetFactory {
+        Object get() throws InstantiationException, IllegalAccessException;
+    }
+
+    private void addSubscription(String baseSubject, String queueGroup, final Method method, final TargetFactory targetFactory) {
         Map<Integer, String> subjectParams = new HashMap<>();
 
         final String[] subjectBaseSegments = baseSubject.split("\\.");
@@ -116,7 +120,7 @@ public class Router implements AutoCloseable {
                         }
                 ).toArray();
 
-                Object reply = method.invoke(target, params);
+                Object reply = method.invoke(targetFactory.get(), params);
 
                 if (reply != null) {
                     connection.publish(msg.getReplyTo(), jsonMapper.writeValueAsBytes(reply));
@@ -131,9 +135,9 @@ public class Router implements AutoCloseable {
         subscriptions.add(subscription);
     }
 
-    public void register(Object object) {
-        List<Method> subscribeMethod = getMethodsAnnotatedWith(object.getClass(), Subscribe.class);
-        Subject classSubject = object.getClass().getAnnotation(Subject.class);
+    private void doRegister(Class<?> clazz, TargetFactory targetFactory) {
+        List<Method> subscribeMethod = getMethodsAnnotatedWith(clazz, Subscribe.class);
+        Subject classSubject = clazz.getAnnotation(Subject.class);
         String subjectPrefix = classSubject != null ? classSubject.value() : null;
         log.info("Registering " + subscribeMethod.size() + " methods");
 
@@ -156,9 +160,17 @@ public class Router implements AutoCloseable {
             QueueGroup queueGroup = method.getAnnotation(QueueGroup.class);
             String queueGroupValue = queueGroup != null ? queueGroup.value() : null;
 
-            addSubscription(subjectJoiner.toString(), queueGroupValue, method, object);
+            addSubscription(subjectJoiner.toString(), queueGroupValue, method, targetFactory::get);
             log.info(" Method: " + method.getName() + ", Subject: " + subjectJoiner.toString());
         }
+    }
+
+    public void register(final Object object) {
+        doRegister(object.getClass(), () -> object);
+    }
+
+    public void register(final Class<?> clazz) {
+        doRegister(clazz, () -> clazz.newInstance());
     }
 
     @Override
