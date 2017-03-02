@@ -66,13 +66,13 @@ public class Publisher<T> {
             Subject baseSubject = method.getDeclaringClass().getAnnotation(Subject.class);
             Publish subject = method.getAnnotation(Publish.class);
 
-            String reply = (subject.replyTo() == null || subject.replyTo().isEmpty()) ? null : subject.replyTo();
-
-            Class<?> retType = method.getReturnType();
-
             Object value = null;
 
             if (subject != null) {
+                String reply = (subject.replyTo() == null || subject.replyTo().isEmpty()) ? null : subject.replyTo();
+
+                Class<?> retType = method.getReturnType();
+
                 String subjectValue = "";
                 if (baseSubject != null) {
                     subjectValue = baseSubject.value() + ".";
