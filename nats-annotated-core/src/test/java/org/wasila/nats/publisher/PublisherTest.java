@@ -79,6 +79,22 @@ public class PublisherTest {
         verifyNoMoreInteractions(cn);
     }
 
+    @Subject("my-subject")
+    public interface PublisherInterfaceSubjectOnly {
+        void publishMe(TestDto test);
+    }
+
+    @Test
+    public void createSubjectOnlyPublisher() throws IOException, TimeoutException {
+        PublisherInterfaceSubjectOnly publisher = Publisher.builder().target(PublisherInterfaceSubjectOnly.class, cf);
+
+        publisher.publishMe(new TestDto());
+
+        verify(cn).publish(eq("my-subject"), isNull(String.class), any(byte[].class));
+        verify(cn).close();
+        verifyNoMoreInteractions(cn);
+    }
+
     public interface PublisherInterfaceWithResponse {
         @Publish(subject = "my-subject")
         ResponseDto publishMe(TestDto test);
@@ -117,6 +133,15 @@ public class PublisherTest {
         verify(cn).publish(eq("base-subject.my-subject"), isNull(String.class), any(byte[].class));
         verify(cn).close();
         verifyNoMoreInteractions(cn);
+    }
+
+    public interface FaultyPublisherInterface {
+        void publishMe(TestDto test);
+    }
+
+    @Test(expected=NoPublishException.class)
+    public void createPublisherWithNotAnnotatedInterface() {
+        Publisher.builder().target(FaultyPublisherInterface.class, cf);
     }
 
 }
