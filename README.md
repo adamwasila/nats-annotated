@@ -6,7 +6,7 @@ Publisher part is heavy inspired on Feign declarative interfaces and subscriber 
 
 Note that currently it is just a quick proof of concept, toy to play with, not a library ready to use.
 
-Keep in mind that there are already implemented spring bindings for NATS, that support similar annotation based approwach:
+Keep in mind that there are already implemented spring bindings for NATS, that support similar annotation based approach:
 https://github.com/cloudfoundry-community/java-nats/tree/master/client-spring
 
 ## General TODO:
