@@ -27,6 +27,7 @@ import org.wasila.nats.annotation.Subject;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.concurrent.TimeUnit;
 
 public class Publisher<T> {
 
@@ -40,6 +41,17 @@ public class Publisher<T> {
 
         public <T> T target(Class<T> clazz, ConnectionFactory connectionFactory) {
             Publisher<T> publisher = new Publisher<>(connectionFactory, clazz);
+
+            boolean hasTopSubject = clazz.getAnnotation(Subject.class) != null;
+
+            for (Method method : clazz.getMethods()) {
+                boolean hasPublish = method.getAnnotation(Publish.class) != null;
+                if (!hasTopSubject && !hasPublish) {
+                    throw new NoPublishException(String.format("Method %s::%s is not annotated properely to publish to nats",
+                            clazz.getName(), method.getName()));
+                }
+            }
+
             return publisher.createProxyImplementation();
         }
 
@@ -68,22 +80,30 @@ public class Publisher<T> {
 
             Object value = null;
 
-            if (subject != null) {
-                String reply = (subject.replyTo() == null || subject.replyTo().isEmpty()) ? null : subject.replyTo();
+            String reply = (subject == null || subject.replyTo() == null || subject.replyTo().isEmpty()) ? null : subject.replyTo();
+            int timeout = subject != null ? subject.timeout() : -1;
+            TimeUnit timeoutUnit = subject != null ? subject.timeoutUnit() : TimeUnit.MILLISECONDS;
 
+            if (baseSubject != null || subject != null) {
                 Class<?> retType = method.getReturnType();
-
                 String subjectValue = "";
+
                 if (baseSubject != null) {
-                    subjectValue = baseSubject.value() + ".";
+                    subjectValue = baseSubject.value();
                 }
-                subjectValue += subject.subject();
+
+                if (subject != null) {
+                    if (subjectValue != null && !subjectValue.isEmpty()) {
+                        subjectValue += ".";
+                    }
+                    subjectValue += subject.subject();
+                }
 
                 Connection cn = connectionFactory.createConnection();
                 ObjectMapper objectMapper = new ObjectMapper();
                 if (retType != void.class) {
                     Message msg = cn.request(subjectValue, objectMapper.writeValueAsBytes(args[0]),
-                            subject.timeout(), subject.timeoutUnit());
+                            timeout, timeoutUnit);
                     value = objectMapper.readValue(msg.getData(), retType);
                 } else {
                     cn.publish(subjectValue, reply, objectMapper.writeValueAsBytes(args[0]));
