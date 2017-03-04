@@ -47,7 +47,7 @@ public class Publisher<T> {
             for (Method method : clazz.getMethods()) {
                 boolean hasPublish = method.getAnnotation(Publish.class) != null;
                 if (!hasTopSubject && !hasPublish) {
-                    throw new NoPublishException(String.format("Method %s::%s is not annotated properely to publish to nats",
+                    throw new PublisherConfigurationException(String.format("Method %s::%s is not annotated properely to publish to nats",
                             clazz.getName(), method.getName()));
                 }
             }

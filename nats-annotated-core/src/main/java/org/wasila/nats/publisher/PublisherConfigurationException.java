@@ -15,23 +15,23 @@
  */
 package org.wasila.nats.publisher;
 
-public class NoPublishException extends RuntimeException {
-    public NoPublishException() {
+public class PublisherConfigurationException extends RuntimeException {
+    public PublisherConfigurationException() {
     }
 
-    public NoPublishException(String message) {
+    public PublisherConfigurationException(String message) {
         super(message);
     }
 
-    public NoPublishException(String message, Throwable cause) {
+    public PublisherConfigurationException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public NoPublishException(Throwable cause) {
+    public PublisherConfigurationException(Throwable cause) {
         super(cause);
     }
 
-    public NoPublishException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public PublisherConfigurationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

@@ -139,7 +139,7 @@ public class PublisherTest {
         void publishMe(TestDto test);
     }
 
-    @Test(expected=NoPublishException.class)
+    @Test(expected=PublisherConfigurationException.class)
     public void createPublisherWithNotAnnotatedInterface() {
         Publisher.builder().target(FaultyPublisherInterface.class, cf);
     }
