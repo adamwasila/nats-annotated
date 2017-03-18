@@ -59,6 +59,10 @@ public class Publisher<T> {
             return this.target(clazz, new ConnectionFactory(url));
         }
 
+        public <T> T target(Class<T> clazz) {
+            return this.target(clazz, ConnectionFactory.DEFAULT_URL);
+        }
+
     }
 
     private T createProxyImplementation() {
