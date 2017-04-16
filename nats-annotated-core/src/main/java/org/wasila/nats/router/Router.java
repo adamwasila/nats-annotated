@@ -177,6 +177,10 @@ public class Router implements AutoCloseable {
     @Override
     public void close() {
         unregisterAllAndClose();
+        if (shutdownHook != null) {
+            Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            shutdownHook = null;
+        }
     }
 
     private void registerCleanupTask() {
@@ -191,10 +195,6 @@ public class Router implements AutoCloseable {
 
     private void unregisterAllAndClose() {
         try {
-            if (shutdownHook != null) {
-                Runtime.getRuntime().removeShutdownHook(shutdownHook);
-                shutdownHook = null;
-            }
             for (Subscription sub : subscriptions) {
                 if (sub.isValid()) {
                     sub.unsubscribe();
