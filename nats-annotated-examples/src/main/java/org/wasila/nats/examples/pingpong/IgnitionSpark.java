@@ -19,8 +19,10 @@ import org.wasila.nats.annotation.Publish;
 import org.wasila.nats.examples.pingpong.dto.Ping;
 import org.wasila.nats.publisher.Publisher;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Random;
+import java.util.concurrent.TimeoutException;
 
 public class IgnitionSpark {
 
@@ -35,11 +37,11 @@ public class IgnitionSpark {
         pongPublisher.sendRequest(new Ping(new Random().nextInt(1000), LocalDateTime.now().toString()));
     }
 
-    public IgnitionSpark() {
+    public IgnitionSpark() throws IOException, TimeoutException {
         pongPublisher = Publisher.builder().target(PingPublisher.class, "nats://127.0.0.1:4222");
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, TimeoutException {
         new IgnitionSpark().initiate();
     }
 

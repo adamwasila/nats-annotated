@@ -21,6 +21,9 @@ import org.wasila.nats.annotation.Publish;
 import org.wasila.nats.examples.composite.dto.Hello;
 import org.wasila.nats.publisher.Publisher;
 
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+
 public class CompositePublisher {
 
     public interface ExamplePublisher {
@@ -35,7 +38,7 @@ public class CompositePublisher {
 
     private static Logger log = LoggerFactory.getLogger(CompositePublisher.class);
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException, TimeoutException {
 
         ExamplePublisher publisher = Publisher.builder()
                 .target(ExamplePublisher.class, "nats://localhost:4222");

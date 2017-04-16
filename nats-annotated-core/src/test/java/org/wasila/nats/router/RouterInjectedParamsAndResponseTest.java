@@ -55,7 +55,6 @@ public class RouterInjectedParamsAndResponseTest extends TestBase {
         router.close();
 
         verify(cn).subscribe(eq(SUBJECT), isNull(String.class), isA(MessageHandler.class));
-        verify(cn).close();
         verifyNoMoreInteractions(cn);
 
         validateResponse(RESPONSE_HANDLER_ID, 1, cn, msg);
@@ -78,7 +77,6 @@ public class RouterInjectedParamsAndResponseTest extends TestBase {
         router.close();
 
         verify(cn).subscribe(eq(SUBJECT), isNull(String.class), isA(MessageHandler.class));
-        verify(cn).close();
         verifyNoMoreInteractions(cn);
 
         validateResponse(RESPONSE_HANDLER_ID, 1, null, msg);
@@ -101,7 +99,6 @@ public class RouterInjectedParamsAndResponseTest extends TestBase {
         router.close();
 
         verify(cn).subscribe(eq(SUBJECT), isNull(String.class), isA(MessageHandler.class));
-        verify(cn).close();
         verifyNoMoreInteractions(cn);
 
         validateResponse(RESPONSE_HANDLER_ID, 1, cn, null);

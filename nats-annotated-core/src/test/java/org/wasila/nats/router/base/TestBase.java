@@ -132,7 +132,7 @@ public class TestBase {
 
     protected Router prepareRouter(Class resourceClazz) {
         try {
-            Router router = new Router(cf);
+            Router router = new Router(cn);
             Object resource = resourceClazz.getConstructor(getClass()).newInstance(this);
             router.register(resource);
 

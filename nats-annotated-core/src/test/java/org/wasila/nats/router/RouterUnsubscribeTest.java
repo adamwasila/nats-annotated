@@ -40,13 +40,12 @@ public class RouterUnsubscribeTest extends TestBase {
 
     @Test
     public void testUnsubscribeWithOneResourceMethod() throws IOException, TimeoutException {
-        Router router = new Router(cf);
+        Router router = new Router(cn);
         router.register(new TestResource());
 
         router.close();
 
         verify(cn).subscribe(eq("test-subject"), isNull(String.class), isA(MessageHandler.class));
-        verify(cn).close();
         verifyNoMoreInteractions(cn);
 
         verify(sub).isValid();
@@ -58,14 +57,13 @@ public class RouterUnsubscribeTest extends TestBase {
 
     @Test
     public void testUnsubscribeThenSubscribeAgain() throws IOException, TimeoutException {
-        Router router = new Router(cf);
+        Router router = new Router(cn);
         router.register(new TestResource());
         router.close();
         router.register(new TestResource());
         router.close();
 
         verify(cn, times(2)).subscribe(eq("test-subject"), isNull(String.class), isA(MessageHandler.class));
-        verify(cn, times(2)).close();
         verifyNoMoreInteractions(cn);
 
         verify(sub, times(2)).isValid();

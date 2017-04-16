@@ -23,24 +23,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wasila.nats.annotation.Publish;
 import org.wasila.nats.annotation.Subject;
+import org.wasila.nats.internal.ConnectionPool;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class Publisher<T> {
 
     private final Logger log = LoggerFactory.getLogger(Publisher.class);
 
-    private final ConnectionFactory connectionFactory;
+    private final Connection connection;
+
     private final PublisherInvocatorHandler handler;
     private final Class clazz;
 
     public static class Builder {
 
-        public <T> T target(Class<T> clazz, ConnectionFactory connectionFactory) {
-            Publisher<T> publisher = new Publisher<>(connectionFactory, clazz);
+        public <T> T target(Class<T> clazz, Connection connection) throws IOException, TimeoutException {
+            Publisher<T> publisher = new Publisher<>(connection, clazz);
 
             boolean hasTopSubject = clazz.getAnnotation(Subject.class) != null;
 
@@ -55,11 +59,11 @@ public class Publisher<T> {
             return publisher.createProxyImplementation();
         }
 
-        public <T> T target(Class<T> clazz, String url) {
-            return this.target(clazz, new ConnectionFactory(url));
+        public <T> T target(Class<T> clazz, String url) throws IOException, TimeoutException {
+            return this.target(clazz, ConnectionPool.getConnectionForUrl(url));
         }
 
-        public <T> T target(Class<T> clazz) {
+        public <T> T target(Class<T> clazz) throws IOException, TimeoutException {
             return this.target(clazz, ConnectionFactory.DEFAULT_URL);
         }
 
@@ -70,9 +74,9 @@ public class Publisher<T> {
                 new Class[] {clazz}, new PublisherInvocatorHandler());
     }
 
-    private Publisher(ConnectionFactory connectionFactory, Class clazz) {
+    private Publisher(Connection connection, Class clazz) throws IOException, TimeoutException {
         this.clazz = clazz;
-        this.connectionFactory = connectionFactory;
+        this.connection = connection;
         handler = new PublisherInvocatorHandler();
     }
 
@@ -103,16 +107,14 @@ public class Publisher<T> {
                     subjectValue += subject.subject();
                 }
 
-                Connection cn = connectionFactory.createConnection();
                 ObjectMapper objectMapper = new ObjectMapper();
                 if (retType != void.class) {
-                    Message msg = cn.request(subjectValue, objectMapper.writeValueAsBytes(args[0]),
+                    Message msg = connection.request(subjectValue, objectMapper.writeValueAsBytes(args[0]),
                             timeout, timeoutUnit);
                     value = objectMapper.readValue(msg.getData(), retType);
                 } else {
-                    cn.publish(subjectValue, reply, objectMapper.writeValueAsBytes(args[0]));
+                    connection.publish(subjectValue, reply, objectMapper.writeValueAsBytes(args[0]));
                 }
-                cn.close();
             } else {
                 log.warn("Could not invoke publish action: subject is null");
             }

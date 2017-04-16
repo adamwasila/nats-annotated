@@ -52,7 +52,7 @@ public class RouterClassSubscriptionTest extends TestBase {
 
     @Test
     public void registerOnInstanceResource() throws IOException, TimeoutException {
-        Router router = new Router(cf);
+        Router router = new Router(cn);
         router.register(new TestResource());
         currentHandler.onMessage(msg);
         currentHandler.onMessage(msg);
@@ -65,7 +65,7 @@ public class RouterClassSubscriptionTest extends TestBase {
 
     @Test
     public void registerOnClasResource() throws IOException, TimeoutException {
-        Router router = new Router(cf);
+        Router router = new Router(cn);
         router.register(TestResource.class);
         currentHandler.onMessage(msg);
         currentHandler.onMessage(msg);

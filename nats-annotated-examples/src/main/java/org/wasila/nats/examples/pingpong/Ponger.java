@@ -40,7 +40,7 @@ public class Ponger {
 
         private PongPublisher pongPublisher;
 
-        public PingResource() {
+        public PingResource() throws IOException, TimeoutException {
             pongPublisher = Publisher.builder().target(PongPublisher.class, "nats://127.0.0.1:4222");
         }
 

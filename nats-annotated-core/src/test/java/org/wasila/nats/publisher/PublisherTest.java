@@ -70,12 +70,11 @@ public class PublisherTest {
     @Test
     public void createSimplePublisherFireAndForgetStyle() throws IOException, TimeoutException {
 
-        PublisherInterface publisher = Publisher.builder().target(PublisherInterface.class, cf);
+        PublisherInterface publisher = Publisher.builder().target(PublisherInterface.class, cn);
 
         publisher.publishMe(new TestDto());
 
         verify(cn).publish(eq("my-subject"), isNull(String.class), any(byte[].class));
-        verify(cn).close();
         verifyNoMoreInteractions(cn);
     }
 
@@ -86,12 +85,11 @@ public class PublisherTest {
 
     @Test
     public void createSubjectOnlyPublisher() throws IOException, TimeoutException {
-        PublisherInterfaceSubjectOnly publisher = Publisher.builder().target(PublisherInterfaceSubjectOnly.class, cf);
+        PublisherInterfaceSubjectOnly publisher = Publisher.builder().target(PublisherInterfaceSubjectOnly.class, cn);
 
         publisher.publishMe(new TestDto());
 
         verify(cn).publish(eq("my-subject"), isNull(String.class), any(byte[].class));
-        verify(cn).close();
         verifyNoMoreInteractions(cn);
     }
 
@@ -103,14 +101,13 @@ public class PublisherTest {
     @Test
     public void createSimplePublisherReturningValue() throws IOException, TimeoutException {
 
-        PublisherInterfaceWithResponse publisher = Publisher.builder().target(PublisherInterfaceWithResponse.class, cf);
+        PublisherInterfaceWithResponse publisher = Publisher.builder().target(PublisherInterfaceWithResponse.class, cn);
 
         when(cn.request(eq("my-subject"), Matchers.<byte[]>any(), anyInt(), any(TimeUnit.class))).thenReturn(msg);
 
         ResponseDto response = publisher.publishMe(new TestDto());
 
         verify(cn).request(eq("my-subject"), any(byte[].class), anyInt(), any(TimeUnit.class));
-        verify(cn).close();
         verifyNoMoreInteractions(cn);
 
         assertThat(response, is(notNullValue()));
@@ -126,12 +123,11 @@ public class PublisherTest {
     @Test
     public void createSimplePublisherWithComposedSubject() throws IOException, TimeoutException {
 
-        PublisherInterfaceWithComposedSubject publisher = Publisher.builder().target(PublisherInterfaceWithComposedSubject.class, cf);
+        PublisherInterfaceWithComposedSubject publisher = Publisher.builder().target(PublisherInterfaceWithComposedSubject.class, cn);
 
         publisher.publishMe(new TestDto());
 
         verify(cn).publish(eq("base-subject.my-subject"), isNull(String.class), any(byte[].class));
-        verify(cn).close();
         verifyNoMoreInteractions(cn);
     }
 
@@ -140,8 +136,8 @@ public class PublisherTest {
     }
 
     @Test(expected=PublisherConfigurationException.class)
-    public void createPublisherWithNotAnnotatedInterface() {
-        Publisher.builder().target(FaultyPublisherInterface.class, cf);
+    public void createPublisherWithNotAnnotatedInterface() throws IOException, TimeoutException {
+        Publisher.builder().target(FaultyPublisherInterface.class, cn);
     }
 
 }

@@ -21,6 +21,9 @@ import org.wasila.nats.annotation.Publish;
 import org.wasila.nats.examples.pubsub.dto.Hello;
 import org.wasila.nats.publisher.Publisher;
 
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+
 public class PublisherExample {
 
     public interface ExamplePublisher {
@@ -42,7 +45,7 @@ public class PublisherExample {
         Thread.sleep(500);
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException, TimeoutException {
 
         ExamplePublisher publisher = Publisher.builder()
                 .target(ExamplePublisher.class, "nats://localhost:4222");

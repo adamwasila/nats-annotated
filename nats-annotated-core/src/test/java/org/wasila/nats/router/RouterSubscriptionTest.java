@@ -41,7 +41,7 @@ public class RouterSubscriptionTest extends TestBase {
 
     @Test
     public void createRouterWithSimplestSubscription() throws IOException, TimeoutException {
-        Router router = new Router(cf);
+        Router router = new Router(cn);
         router.register(new TestResource());
         router.register(TestResource.class);
         router.close();
@@ -65,7 +65,7 @@ public class RouterSubscriptionTest extends TestBase {
 
     @Test
     public void createRouterWithMultipleSubscription() throws IOException, TimeoutException {
-        Router router = new Router(cf);
+        Router router = new Router(cn);
         router.register(new TestResourceSameSubject());
         router.register(TestResourceSameSubject.class);
         router.close();
@@ -83,7 +83,7 @@ public class RouterSubscriptionTest extends TestBase {
 
     @Test
     public void createRouterWithSubscriptionWithNoSubject() throws IOException, TimeoutException {
-        Router router = new Router(cf);
+        Router router = new Router(cn);
         router.register(new TestResourceNoSubject());
         router.register(TestResourceNoSubject.class);
         router.close();
@@ -102,7 +102,7 @@ public class RouterSubscriptionTest extends TestBase {
 
     @Test
     public void createRouterWithCompositeSubscription() throws IOException, TimeoutException {
-        Router router = new Router(cf);
+        Router router = new Router(cn);
         router.register(new TestCompositeSubResource());
         router.register(TestCompositeSubResource.class);
         router.close();
@@ -121,7 +121,7 @@ public class RouterSubscriptionTest extends TestBase {
 
     @Test
     public void createRouterWithQueueGroupSubscription() throws IOException, TimeoutException {
-        Router router = new Router(cf);
+        Router router = new Router(cn);
         router.register(new TestQueueGroupResource());
         router.register(TestQueueGroupResource.class);
         router.close();
@@ -138,7 +138,7 @@ public class RouterSubscriptionTest extends TestBase {
 
     @Test(expected=NoSubscriptionException.class)
     public void registerResourceWithNoResourceMethods() throws IOException, TimeoutException {
-        Router router = new Router(cf);
+        Router router = new Router(cn);
         try {
             router.register(new TestEmptyResource());
         } finally {
@@ -148,7 +148,7 @@ public class RouterSubscriptionTest extends TestBase {
 
     @Test(expected=NoSubscriptionException.class)
     public void registerClassResourceWithNoResourceMethods() throws IOException, TimeoutException {
-        Router router = new Router(cf);
+        Router router = new Router(cn);
         try {
             router.register(TestEmptyResource.class);
         } finally {

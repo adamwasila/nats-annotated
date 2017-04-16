@@ -27,6 +27,7 @@ import org.wasila.nats.annotation.QueueGroup;
 import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.annotation.SubjectParam;
 import org.wasila.nats.annotation.Subscribe;
+import org.wasila.nats.internal.ConnectionPool;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -56,12 +57,12 @@ public class Router implements AutoCloseable {
     }
 
     public Router(String url) throws IOException, TimeoutException {
-        this(new ConnectionFactory(url));
+        this(ConnectionPool.getConnectionForUrl(url));
     }
 
-    public Router(ConnectionFactory connectionFactory) throws IOException, TimeoutException {
+    public Router(Connection connection) throws IOException, TimeoutException {
         this.jsonMapper = new ObjectMapper();
-        this.connection = connectionFactory.createConnection();
+        this.connection = connection;
         this.subscriptions = new ArrayList<>();
         registerCleanupTask();
     }
@@ -200,7 +201,6 @@ public class Router implements AutoCloseable {
                 }
             }
             subscriptions.clear();
-            connection.close();
         } catch (IOException e) {
             log.error("Unsubscribe failed", e);
         }

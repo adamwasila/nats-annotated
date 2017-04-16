@@ -119,7 +119,7 @@ public class RouterSubscriptionWithParamsTest extends TestBase {
     protected void executeTest(String messageSubject, Object resourceInstance) throws IOException, TimeoutException {
         when(msg.getSubject()).thenReturn(messageSubject);
 
-        Router router = new Router(cf);
+        Router router = new Router(cn);
         router.register(resourceInstance);
 
         currentHandler.onMessage(msg);
