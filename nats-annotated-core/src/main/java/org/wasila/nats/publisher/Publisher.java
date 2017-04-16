@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wasila.nats.annotation.Publish;
 import org.wasila.nats.annotation.Subject;
-import org.wasila.nats.internal.ConnectionPool;
+import org.wasila.nats.internal.ConnectionCache;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
@@ -60,7 +60,7 @@ public class Publisher<T> {
         }
 
         public <T> T target(Class<T> clazz, String url) throws IOException, TimeoutException {
-            return this.target(clazz, ConnectionPool.getConnectionForUrl(url));
+            return this.target(clazz, ConnectionCache.getConnectionForUrl(url));
         }
 
         public <T> T target(Class<T> clazz) throws IOException, TimeoutException {

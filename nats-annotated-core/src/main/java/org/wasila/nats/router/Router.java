@@ -27,7 +27,7 @@ import org.wasila.nats.annotation.QueueGroup;
 import org.wasila.nats.annotation.Subject;
 import org.wasila.nats.annotation.SubjectParam;
 import org.wasila.nats.annotation.Subscribe;
-import org.wasila.nats.internal.ConnectionPool;
+import org.wasila.nats.internal.ConnectionCache;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -57,7 +57,7 @@ public class Router implements AutoCloseable {
     }
 
     public Router(String url) throws IOException, TimeoutException {
-        this(ConnectionPool.getConnectionForUrl(url));
+        this(ConnectionCache.getConnectionForUrl(url));
     }
 
     public Router(Connection connection) throws IOException, TimeoutException {

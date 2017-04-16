@@ -25,9 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-public class ConnectionPool {
+public class ConnectionCache {
 
-    private final Logger log = LoggerFactory.getLogger(ConnectionPool.class);
+    private final Logger log = LoggerFactory.getLogger(ConnectionCache.class);
 
     private Map<String, ConnectionFactory> factories = new HashMap<>();
 
@@ -35,9 +35,9 @@ public class ConnectionPool {
 
     private Thread shutdownHook;
 
-    private static ConnectionPool instance;
+    private static ConnectionCache instance;
 
-    private ConnectionPool() {
+    private ConnectionCache() {
         registerCleanupTask();
     }
 
@@ -74,9 +74,9 @@ public class ConnectionPool {
         }
     }
 
-    private synchronized static ConnectionPool getInstance() {
+    private synchronized static ConnectionCache getInstance() {
         if (instance == null) {
-            instance = new ConnectionPool();
+            instance = new ConnectionCache();
         }
         return instance;
     }
