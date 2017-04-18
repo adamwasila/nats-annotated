@@ -68,6 +68,7 @@ public class Publisher<T> {
 
     }
 
+    @SuppressWarnings("unchecked")
     private T createProxyImplementation() {
         return (T) Proxy.newProxyInstance(clazz.getClassLoader(),
                 new Class[] {clazz}, new PublisherInvocatorHandler());
