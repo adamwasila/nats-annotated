@@ -38,7 +38,6 @@ public class Publisher<T> {
 
     private final Connection connection;
 
-    private final PublisherInvocatorHandler handler;
     private final Class clazz;
 
     public static class Builder {
@@ -77,7 +76,6 @@ public class Publisher<T> {
     private Publisher(Connection connection, Class clazz) throws IOException, TimeoutException {
         this.clazz = clazz;
         this.connection = connection;
-        handler = new PublisherInvocatorHandler();
     }
 
     private class PublisherInvocatorHandler implements InvocationHandler {
