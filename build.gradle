@@ -6,3 +6,7 @@ subprojects {
     publicationRepoName = "maven"
   }
 }
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.5'
+}
