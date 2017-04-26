@@ -1,5 +1,8 @@
 # NATS pub/sub declarative interface
 
+[![Build Status](https://travis-ci.org/adamwasila/nats-annotated.svg?branch=master)](https://travis-ci.org/adamwasila/nats-annotated)
+[![GitHub version](https://badge.fury.io/gh/adamwasila%2Fnats-annotated.svg)](https://badge.fury.io/gh/adamwasila%2Fnats-annotated)
+
 ## Foreword
 
 Simple library with minimal dependencies that uses concept simmilar to JAX-RS resources to subscribe to handle NATS messages directly. From the other side of message bus: publisher interfaces are inspired by Feign declarative interfaces.
